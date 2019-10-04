@@ -1,0 +1,69 @@
+use crate::lib::*;
+use crate::info::JsonApi;
+use crate::data::*;
+use crate::core::data_object::create_data_object;
+use crate::relationship::HaveRelationship;
+
+fn ser<S, T: ResourceIdentifiable, I, E, J>(
+    serializer: S,
+    data: &Result<JsonApiPrimaryDataObject<T, I>, E>,
+    json_api: Option<J>) -> Result<S::Ok, S::Error>
+    where S: Serializer, T: Serialize, I: Serialize, E: Serialize, J: Serialize {
+    let mut state = serializer.serialize_struct("Response", 1)?;
+    match data {
+        Ok(api_result) => {
+            // Serialize root data field
+            match &api_result.data {
+                PrimaryObjectType::Single(data) => {
+                    state.serialize_field("data", &create_data_object(data))?;
+                },
+                PrimaryObjectType::Multiple(data_vec) => {
+                    let data_object_vec = data_vec.iter().map(create_data_object).collect::<Vec<_>>();
+                    state.serialize_field("data", &data_object_vec)?;
+                }
+            };
+            // Serialize root links field
+            match &api_result.links {
+                Some(link) => {
+                    // TODO handle if neither field (self or related) is set, by not parsing the links field
+                    state.serialize_field("links", &link)?;
+                },
+                None => {}
+            };
+            match &api_result.included {
+                Some(inclusions) => {
+                    state.serialize_field("included", &inclusions)?;
+                }
+                None => {}
+            };
+        },
+        Err(err) => {
+            state.serialize_field("error", &err)?;
+        }
+    };
+    // Serialize root jsonapi field
+    match json_api {
+        Some(json) => {
+            state.serialize_field("jsonapi", &json)?;
+        },
+        None => {}
+    };
+    state.end()
+}
+
+pub struct JsonApiResponse<Data: ResourceIdentifiable, Included, Error>(pub Result<JsonApiPrimaryDataObject<Data, Included>, Error>);
+
+impl<Data: ResourceIdentifiable, Included, Error> Serialize for JsonApiResponse<Data, Included, Error>
+    where Data: Serialize, Included: Serialize, Error: Serialize {
+    default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        ser(serializer, &self.0, None::<()>)
+    }
+}
+
+impl<Data: ResourceIdentifiable, Included, Error> Serialize for JsonApiResponse<Data, Included, Error>
+    where Data: Serialize, Included: Serialize, Error: Serialize,
+          JsonApiResponse<Data, Included, Error>: JsonApi {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        ser(serializer, &self.0, Some(&self.get_json_api_field()))
+    }
+}

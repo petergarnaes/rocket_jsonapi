@@ -1,6 +1,7 @@
 use crate::lib::*;
 use crate::links::JsonApiLinks;
 use crate::relationship::RelationObject;
+use crate::core::data_object::create_data_object;
 
 pub trait ResourceIdentifiable {
     fn get_type(&self) -> &'static str;
@@ -97,6 +98,36 @@ impl<Data: ResourceIdentifiable, Included> JsonApiPrimaryDataObject<Data, Includ
     pub fn from_data_links_included(data: PrimaryObjectType<Data>, links: JsonApiLinks, included: Vec<Included>) -> JsonApiPrimaryDataObject<Data, Included> {
         //JsonApiPrimaryDataObject { data, links: Some(links), included: Some(included), relationships: None::<_> }
         JsonApiPrimaryDataObject { data, links: Some(links), included: Some(included) }
+    }
+}
+
+impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
+    where Data: Serialize + ResourceIdentifiable, Included: Serialize {
+    default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        let mut state = serializer.serialize_struct("JsonApiPrimaryDataObject", 1)?;
+        match &self.data {
+            PrimaryObjectType::Single(data) => {
+                state.serialize_field("data", &create_data_object(data))?;
+            },
+            PrimaryObjectType::Multiple(data_vec) => {
+                let data_object_vec = data_vec.iter().map(create_data_object).collect::<Vec<_>>();
+                state.serialize_field("data", &data_object_vec)?;
+            }
+        };
+        match &self.links {
+            Some(link) => {
+                // TODO handle if neither field (self or related) is set, by not parsing the links field
+                state.serialize_field("links", &link)?;
+            },
+            None => {}
+        };
+        match &self.included {
+            Some(inclusions) => {
+                state.serialize_field("included", &inclusions)?;
+            }
+            None => {}
+        };
+        state.end()
     }
 }
 

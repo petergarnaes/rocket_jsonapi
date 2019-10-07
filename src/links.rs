@@ -1,9 +1,20 @@
 use crate::lib::*;
 
+/*
+pub struct LinksMeta(Box<dyn Serialize>);
+
+impl Serialize for LinksMeta {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
+        S: Serializer {
+        (*self.0).serialize()
+    }
+}
+*/
+
 #[derive(Serialize)]
-pub struct LinkObject<M: Serialize> {
+pub struct LinkObject {
     href: String,
-    meta: M
+    meta: String
 }
 
 #[derive(Serialize)]
@@ -11,18 +22,18 @@ pub struct JsonApiLinks {
 
 }
 
-pub enum LinksObject<M: Serialize> {
+pub enum LinksObject {
     Url(String),
-    Object(LinkObject<M>)
+    Object(LinkObject)
 }
 
-pub enum Links<MS: Serialize, MR: Serialize> {
-    LinksSelf(LinksObject<MS>),
-    LinksRelated(LinksObject<MR>),
-    LinksSelfRelated(LinksObject<MS>, LinksObject<MR>)
+pub enum Links {
+    LinksSelf(LinksObject),
+    LinksRelated(LinksObject),
+    LinksSelfRelated(LinksObject, LinksObject)
 }
 
-fn serialize_links_object<S: SerializeStruct, M: Serialize>(state: &mut S, lo: &LinksObject<M>, key: &'static str) {
+fn serialize_links_object<S: SerializeStruct>(state: &mut S, lo: &LinksObject, key: &'static str) {
     match lo {
         LinksObject::Url(url) => {
             state.serialize_field(key, &url);
@@ -33,7 +44,7 @@ fn serialize_links_object<S: SerializeStruct, M: Serialize>(state: &mut S, lo: &
     };
 }
 
-impl<MS: Serialize, MR: Serialize> Serialize for Links<MS, MR> {
+impl Serialize for Links {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
         S: Serializer {
         let mut state = serializer.serialize_struct("LinksObject", 1)?;
@@ -57,11 +68,11 @@ pub trait Linkify {
     type MS: Serialize;
     type MR: Serialize;
     // TODO maybe input could be request, baseURL or something...
-    fn produce_link(&self) -> Option<Links<Self::MS, Self::MR>>;
+    fn produce_link(&self) -> Option<Links>;
 }
 
 impl<MS: Serialize, MR: Serialize> dyn Linkify<MS = MS, MR = MR> {
-    fn produce_link(&self) -> Option<Links<MS, MR>> {
+    fn produce_link(&self) -> Option<Links> {
         None
     }
 }

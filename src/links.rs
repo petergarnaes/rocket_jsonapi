@@ -1,4 +1,5 @@
 use crate::lib::*;
+use crate::links::LinkType::NoLink;
 
 /*
 pub struct LinksMeta(Box<dyn Serialize>);
@@ -84,12 +85,46 @@ pub enum LinkType {
     NoLink
 }
 
-pub trait Linkifiable {
-    fn get_href(&self) -> LinkType;
+pub trait LinkifiableSelf {
+    fn get_href(&self) -> String;
 }
 
-pub trait LinkifyRelatedMeta<M: Serialize>: Linkifiable {
+// Seems like the right approach...
+pub trait LinkifySelfMeta<M: Serialize>: LinkifiableSelf {
     fn get_meta(&self) -> M;
+}
+
+pub trait LinkifiableRelated {
+    fn get_href(&self) -> String;
+}
+
+// Seems like the right approach...
+pub trait LinkifyRelatedMeta<M: Serialize>: LinkifiableRelated {
+    fn get_meta(&self) -> M;
+}
+
+// Move to core, so it is not public API
+
+pub trait GetLinks {
+    fn get_links(&self) -> LinkType;
+}
+
+default impl<T> GetLinks for T {
+    fn get_links(&self) -> LinkType {
+        NoLink
+    }
+}
+
+default impl<T> GetLinks for T where T: LinkifiableSelf {
+    fn get_links(&self) -> LinkType {
+        unimplemented!()
+    }
+}
+
+impl<T> GetLinks for T where T: LinkifiableSelf + LinkifiableRelated {
+    fn get_links(&self) -> LinkType {
+        unimplemented!()
+    }
 }
 
 impl Serialize for LinkType {
@@ -99,7 +134,14 @@ impl Serialize for LinkType {
     }
 }
 
-impl Serialize for dyn Linkifiable {
+impl Serialize for dyn LinkifiableSelf {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
+        S: Serializer {
+        unimplemented!()
+    }
+}
+
+impl Serialize for dyn LinkifiableRelated {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
         S: Serializer {
         unimplemented!()

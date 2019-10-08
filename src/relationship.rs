@@ -1,7 +1,7 @@
 use crate::lib::*;
 use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
 use crate::core::data_object::to_resource_identifier;
-use crate::links::{Links, LinkType, Linkifiable};
+use crate::links::{Links, LinkType, LinkifiableSelf, GetLinks};
 use crate::links::LinkType::NoLink;
 use std::marker::PhantomData;
 use crate::data::ResourceObjectType::{NoResource, Single, Multiple};
@@ -12,7 +12,7 @@ use crate::meta::Metafiable;
 
 pub struct RelationObject {
     data: ResourceObjectType<ResourceIdentifier>,
-    links: LinkType
+    links: String
 }
 
 pub trait HaveRelationship<To> {
@@ -35,7 +35,7 @@ default impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifi
     fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
-        RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: NoLink }
+        RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: "".to_owned() }
     }
 }
 
@@ -44,7 +44,7 @@ default impl<From, To> RelationObjectify<Vec<To>> for From where To: ResourceIde
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
         let res_idents = rel.iter().map(|r| ResourceIdentifier {id: r.get_id(), object_type: r.get_type()}).collect();
-        RelationObject { data: Multiple(res_idents), links: NoLink }
+        RelationObject { data: Multiple(res_idents), links: "".to_owned() }
         //RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: NoLink }
     }
 }
@@ -60,9 +60,10 @@ impl<From, To> RelationObjectify<To> for From where To: Linkifiable, From: HaveR
 }
 */
 
-default impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable + Linkifiable, From: HaveRelationship<To> {
+default impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable + LinkifiableSelf, From: HaveRelationship<To> {
     fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
+        //rel.get_links();
         RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: rel.get_href() }
         //RelationObject { data: to_resource_identifier(&rel), links: rel.get_href() }
     }
@@ -89,14 +90,15 @@ impl<From, To> RelationObjectifyResIden<To> for From where To: ResourceIdentifia
     fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
-        RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: NoLink }
+        RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: "".to_owned() }
     }
 }
 
-impl<From, To> RelationObjectifyLink<To> for From where To: Linkifiable, From: HaveRelationship<To> {
+impl<From, To> RelationObjectifyLink<To> for From where To: LinkifiableSelf, From: HaveRelationship<To> {
     fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
+        //rel.get_links();
         RelationObject { data: NoResource, links: rel.get_href() }
     }
 }

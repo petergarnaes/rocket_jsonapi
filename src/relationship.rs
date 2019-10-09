@@ -1,8 +1,6 @@
 use crate::lib::*;
 use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
 use crate::core::data_object::to_resource_identifier;
-use crate::links::{Links, LinkType, LinkifiableSelf, GetLinks};
-use crate::links::LinkType::NoLink;
 use std::marker::PhantomData;
 use crate::data::ResourceObjectType::{NoResource, Single, Multiple};
 use crate::meta::Metafiable;
@@ -60,15 +58,6 @@ impl<From, To> RelationObjectify<To> for From where To: Linkifiable, From: HaveR
 }
 */
 
-default impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable + LinkifiableSelf, From: HaveRelationship<To> {
-    fn get_relation_object(&self) -> RelationObject {
-        let rel = self.get_relation();
-        //rel.get_links();
-        RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: rel.get_href() }
-        //RelationObject { data: to_resource_identifier(&rel), links: rel.get_href() }
-    }
-}
-
 /*
 impl<From, To, Meta> RelationObjectifyMeta<To, Meta> for From where To: ResourceIdentifiable + HaveRelationship<To> {
     fn get_relation_object(&self) -> RelationObject {
@@ -91,15 +80,6 @@ impl<From, To> RelationObjectifyResIden<To> for From where To: ResourceIdentifia
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
         RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: "".to_owned() }
-    }
-}
-
-impl<From, To> RelationObjectifyLink<To> for From where To: LinkifiableSelf, From: HaveRelationship<To> {
-    fn get_relation_object(&self) -> RelationObject {
-        let rel = self.get_relation();
-        //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
-        //rel.get_links();
-        RelationObject { data: NoResource, links: rel.get_href() }
     }
 }
 

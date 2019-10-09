@@ -1,5 +1,5 @@
 use crate::lib::*;
-use crate::links::JsonApiLinks;
+use crate::links::{JsonApiLinks};
 use crate::relationship::RelationObject;
 use crate::core::data_object::create_data_object;
 
@@ -76,7 +76,6 @@ pub struct JsonApiResourceObject<Data: ResourceIdentifiable> {
 //#[derive(Serialize)]
 pub struct JsonApiPrimaryDataObject<Data: ResourceIdentifiable, Included> {
     pub data: PrimaryObjectType<Data>,
-    pub links: Option<JsonApiLinks>,
     // Primary Data specific, should also be dynamic
     pub included: Option<Vec<Included>>,
     // TODO relationships
@@ -86,18 +85,18 @@ pub struct JsonApiPrimaryDataObject<Data: ResourceIdentifiable, Included> {
 impl<Data: ResourceIdentifiable> JsonApiPrimaryDataObject<Data, ()> {
     pub fn from_data(data: PrimaryObjectType<Data>) -> JsonApiPrimaryDataObject<Data, ()> {
         //JsonApiPrimaryDataObject {data, links: None, included: None, relationships: None::<_> }
-        JsonApiPrimaryDataObject {data, links: None, included: None }
+        JsonApiPrimaryDataObject {data, included: None }
     }
-    pub fn from_data_links(data: PrimaryObjectType<Data>, links: JsonApiLinks) -> JsonApiPrimaryDataObject<Data, ()> {
+    pub fn from_data_links(data: PrimaryObjectType<Data>) -> JsonApiPrimaryDataObject<Data, ()> {
         //JsonApiPrimaryDataObject { data, links: Some(links), included: None, relationships: None::<_> }
-        JsonApiPrimaryDataObject { data, links: Some(links), included: None }
+        JsonApiPrimaryDataObject { data, included: None }
     }
 }
 
 impl<Data: ResourceIdentifiable, Included> JsonApiPrimaryDataObject<Data, Included> {
-    pub fn from_data_links_included(data: PrimaryObjectType<Data>, links: JsonApiLinks, included: Vec<Included>) -> JsonApiPrimaryDataObject<Data, Included> {
+    pub fn from_data_links_included(data: PrimaryObjectType<Data>, included: Vec<Included>) -> JsonApiPrimaryDataObject<Data, Included> {
         //JsonApiPrimaryDataObject { data, links: Some(links), included: Some(included), relationships: None::<_> }
-        JsonApiPrimaryDataObject { data, links: Some(links), included: Some(included) }
+        JsonApiPrimaryDataObject { data, included: Some(included) }
     }
 }
 
@@ -114,13 +113,6 @@ impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
                 state.serialize_field("data", &data_object_vec)?;
             }
         };
-        match &self.links {
-            Some(link) => {
-                // TODO handle if neither field (self or related) is set, by not parsing the links field
-                state.serialize_field("links", &link)?;
-            },
-            None => {}
-        };
         match &self.included {
             Some(inclusions) => {
                 state.serialize_field("included", &inclusions)?;
@@ -130,4 +122,3 @@ impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
         state.end()
     }
 }
-

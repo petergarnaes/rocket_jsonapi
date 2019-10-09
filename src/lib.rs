@@ -1,4 +1,5 @@
 #![feature(specialization)]
+#![feature(associated_type_defaults)]
 #[cfg(test)]
 mod tests {
     #[test]

@@ -1,7 +1,7 @@
+use serde::Serialize;
 use rocket_jsonapi::data::{ResourceIdentifiable, PrimaryObjectType, ResourceObjectType};
-use rocket_jsonapi::links::{Linkify, Links};
-use rocket_jsonapi::links::Links::{LinksSelf};
-use rocket_jsonapi::links::LinksObject::{Url};
+use rocket_jsonapi::links::{Linkify, LinksObject, LinkObject};
+use rocket_jsonapi::links::LinksObject::{Object};
 use rocket_jsonapi::relationship::{HaveRelationship, RelationObjectify, AllRelationships, RelationObject};
 use rocket_jsonapi::data::ResourceObjectType::{Single, Multiple};
 
@@ -21,16 +21,17 @@ impl ResourceIdentifiable for Article {
     }
 }
 
-impl Linkify for Article {
-    type MS = ();
-    type MR = ();
+#[derive(Serialize)]
+struct ArticleLinkMeta {
+    message: &'static str
+}
 
-    fn produce_link(&self) -> Option<Links<Self::MS, Self::MR>> {
-        Some(
-            LinksSelf(
-                Url(format!("/article/{}", self.id.to_string()))
-            )
-        )
+const ARTICLE_LINK_META_MESSAGE: &'static str = "It works!";
+const ARTICLE_LINK_META: ArticleLinkMeta = ArticleLinkMeta { message: ARTICLE_LINK_META_MESSAGE };
+
+impl Linkify for Article {
+    fn get_links(&self) -> Vec<LinksObject> {
+        vec![Object(LinkObject::new("".to_owned(), Box::new(ARTICLE_LINK_META)))]
     }
 }
 
@@ -51,8 +52,8 @@ impl HaveRelationship<ProofReader> for Article {
 impl AllRelationships for Article {
     fn get_all_relation_objects(&self) -> Vec<RelationObject> {
         vec![
-            <dyn RelationObjectify<Author>>::get_relation_object(self),
-            <dyn RelationObjectify<ProofReader>>::get_relation_object(self)
+            //<dyn RelationObjectify<Author>>::get_relation_object(self),
+            //<dyn RelationObjectify<ProofReader>>::get_relation_object(self)
         ]
     }
 }
@@ -74,15 +75,8 @@ impl ResourceIdentifiable for Person {
 }
 
 impl Linkify for Person {
-    type MS = ();
-    type MR = ();
-
-    fn produce_link(&self) -> Option<Links<Self::MS, Self::MR>> {
-        Some(
-            LinksSelf(
-                Url(format!("/person/{}", self.id.to_string()))
-            )
-        )
+    fn get_links(&self) -> Vec<LinksObject> {
+        unimplemented!()
     }
 }
 
@@ -100,15 +94,8 @@ impl ResourceIdentifiable for Author {
 }
 
 impl Linkify for Author {
-    type MS = ();
-    type MR = ();
-
-    fn produce_link(&self) -> Option<Links<Self::MS, Self::MR>> {
-        Some(
-            LinksSelf(
-                Url(format!("/person/{}", self.0.id.to_string()))
-            )
-        )
+    fn get_links(&self) -> Vec<LinksObject> {
+        unimplemented!()
     }
 }
 
@@ -123,8 +110,3 @@ impl ResourceIdentifiable for ProofReader {
         self.0.get_id()
     }
 }
-
-fn test(a: Article) {
-    <dyn RelationObjectify<Author>>::get_relation_object(&a);
-}
-

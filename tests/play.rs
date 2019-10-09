@@ -31,7 +31,7 @@ const ARTICLE_LINK_META: ArticleLinkMeta = ArticleLinkMeta { message: ARTICLE_LI
 
 impl Linkify for Article {
     fn get_links(&self) -> Vec<LinksObject> {
-        vec![Object(LinkObject::new("".to_owned(), Box::new(ARTICLE_LINK_META)))]
+        vec![Object("self".to_string(), LinkObject::new("".to_owned(), Box::new(ARTICLE_LINK_META)))]
     }
 }
 
@@ -52,8 +52,8 @@ impl HaveRelationship<ProofReader> for Article {
 impl AllRelationships for Article {
     fn get_all_relation_objects(&self) -> Vec<RelationObject> {
         vec![
-            //<dyn RelationObjectify<Author>>::get_relation_object(self),
-            //<dyn RelationObjectify<ProofReader>>::get_relation_object(self)
+            <dyn RelationObjectify<Author>>::get_relation_object(self),
+            <dyn RelationObjectify<ProofReader>>::get_relation_object(self)
         ]
     }
 }

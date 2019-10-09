@@ -33,8 +33,8 @@ pub struct JsonApiLinks {
 }
 
 pub enum LinksObject {
-    Url(Url),
-    Object(LinkObject)
+    Url(Key, Url),
+    Object(Key, LinkObject)
 }
 
 // TODO derive version? Maybe for the simple URL case

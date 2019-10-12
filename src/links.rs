@@ -38,9 +38,18 @@ pub enum LinksObject {
 }
 
 // TODO derive version? Maybe for the simple URL case
+// TODO make return type an Option? Or own enum?
 pub trait Linkify {
-    fn get_links(&self) -> Vec<LinksObject>;
+    fn get_links() -> Vec<LinksObject>;
 }
+
+impl<T> Linkify for T {
+    fn get_links() -> Vec<LinksObject> {
+        vec![]
+    }
+}
+
+// TODO maybe do general implementation returning empty list?
 
 // TODO can we use this approach, by have some LinkifySelf trait
 // TODO macro_stuff? Something like: #[derive(HaveLink, To)]

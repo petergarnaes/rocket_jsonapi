@@ -30,6 +30,7 @@ trait RelationObjectifyMeta<To, Meta>: RelationObjectify<To> {
     fn get_meta() -> Meta;
 }
 
+/*
 impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable, From: HaveRelationship<To> {
     default fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
@@ -37,6 +38,7 @@ impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable, Fr
         RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: "".to_owned() }
     }
 }
+*/
 
 impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable + Linkify, From: HaveRelationship<To> {
     fn get_relation_object(&self) -> RelationObject {

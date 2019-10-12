@@ -30,7 +30,7 @@ const ARTICLE_LINK_META_MESSAGE: &'static str = "It works!";
 const ARTICLE_LINK_META: ArticleLinkMeta = ArticleLinkMeta { message: ARTICLE_LINK_META_MESSAGE };
 
 impl Linkify for Article {
-    fn get_links(&self) -> Vec<LinksObject> {
+    fn get_links() -> Vec<LinksObject> {
         vec![Object("self".to_string(), LinkObject::new("".to_owned(), Box::new(ARTICLE_LINK_META)))]
     }
 }
@@ -75,7 +75,7 @@ impl ResourceIdentifiable for Person {
 }
 
 impl Linkify for Person {
-    fn get_links(&self) -> Vec<LinksObject> {
+    fn get_links() -> Vec<LinksObject> {
         unimplemented!()
     }
 }
@@ -94,7 +94,7 @@ impl ResourceIdentifiable for Author {
 }
 
 impl Linkify for Author {
-    fn get_links(&self) -> Vec<LinksObject> {
+    fn get_links() -> Vec<LinksObject> {
         unimplemented!()
     }
 }

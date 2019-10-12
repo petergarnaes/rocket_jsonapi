@@ -1,5 +1,5 @@
 use crate::lib::*;
-use crate::links::{JsonApiLinks};
+use crate::links::{JsonApiLinks, Linkify};
 use crate::relationship::RelationObject;
 use crate::core::data_object::create_data_object;
 
@@ -100,6 +100,7 @@ impl<Data: ResourceIdentifiable, Included> JsonApiPrimaryDataObject<Data, Includ
     }
 }
 
+/*
 impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
     where Data: Serialize + ResourceIdentifiable, Included: Serialize {
     default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
@@ -113,6 +114,44 @@ impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
                 state.serialize_field("data", &data_object_vec)?;
             }
         };
+        match &self.included {
+            Some(inclusions) => {
+                state.serialize_field("included", &inclusions)?;
+            }
+            None => {}
+        };
+        state.end()
+    }
+}
+*/
+
+// TODO could we make this the only implementation, and make default implementation for Linkify and
+// whatever I deside on for Relationships? Since these fields are optional it would make sense to
+// provide the user the option to return nothing, based on the data object (ie. NoLink enum and
+// corresponding in relationship). It would also make gradual and modular implementation possible,
+// ie. only implement Linkify, or only relationship, etc.
+impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
+    where Data: Serialize + ResourceIdentifiable + Linkify, Included: Serialize {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        let mut state = serializer.serialize_struct("JsonApiPrimaryDataObject", 1)?;
+        match &self.data {
+            PrimaryObjectType::Single(data) => {
+                state.serialize_field("data", &create_data_object(data))?;
+            },
+            PrimaryObjectType::Multiple(data_vec) => {
+                let data_object_vec = data_vec.iter().map(create_data_object).collect::<Vec<_>>();
+                state.serialize_field("data", &data_object_vec)?;
+            }
+        };
+        let links = Data::get_links();
+        match links.len() {
+            0 => {
+                // TODO do not parse the links field
+            },
+            _ => {
+                // TODO parse each element as a nested object in parent links object, use provided key
+            }
+        }
         match &self.included {
             Some(inclusions) => {
                 state.serialize_field("included", &inclusions)?;

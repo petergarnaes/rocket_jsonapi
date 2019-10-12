@@ -3,12 +3,14 @@ use crate::info::JsonApi;
 use crate::data::*;
 use crate::core::data_object::create_data_object;
 use crate::relationship::{HaveRelationship, AllRelationships};
+use crate::links::Linkify;
 
 fn ser<S, T, I, E, J>(
     serializer: S,
     result: &Result<JsonApiPrimaryDataObject<T, I>, E>,
     json_api: Option<J>) -> Result<S::Ok, S::Error>
-    where S: Serializer, T: Serialize + ResourceIdentifiable, I: Serialize, E: Serialize, J: Serialize {
+    where S: Serializer, T: Serialize + ResourceIdentifiable + Linkify, I: Serialize, E: Serialize, J:
+Serialize {
     // TODO length aka. number of fields must be correct
     match result {
         Ok(api_result) => {
@@ -23,12 +25,13 @@ fn ser<S, T, I, E, J>(
 pub struct JsonApiResponse<Data: ResourceIdentifiable, Included, Error>(pub Result<JsonApiPrimaryDataObject<Data, Included>, Error>);
 
 impl<Data, Included, Error> Serialize for JsonApiResponse<Data, Included, Error>
-    where Data: Serialize + ResourceIdentifiable, Included: Serialize, Error: Serialize {
+    where Data: Serialize + ResourceIdentifiable + Linkify, Included: Serialize, Error: Serialize {
     default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
         ser(serializer, &self.0, None::<()>)
     }
 }
 
+/*
 impl<Data, Included, Error> Serialize for JsonApiResponse<Data, Included, Error>
     where Data: Serialize + ResourceIdentifiable + AllRelationships, Included: Serialize, Error: Serialize {
     default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
@@ -44,3 +47,4 @@ impl<Data, Included, Error> Serialize for JsonApiResponse<Data, Included, Error>
         ser(serializer, &self.0, Some(&self.get_json_api_field()))
     }
 }
+*/

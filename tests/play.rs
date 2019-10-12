@@ -5,6 +5,14 @@ use rocket_jsonapi::links::LinksObject::{Object};
 use rocket_jsonapi::relationship::{HaveRelationship, RelationObjectify, AllRelationships, RelationObject};
 use rocket_jsonapi::data::ResourceObjectType::{Single, Multiple};
 
+#[derive(Serialize)]
+struct ArticleLinkMeta {
+    message: &'static str
+}
+
+const ARTICLE_LINK_META_MESSAGE: &'static str = "It works!";
+const ARTICLE_LINK_META: ArticleLinkMeta = ArticleLinkMeta { message: ARTICLE_LINK_META_MESSAGE };
+
 struct Article {
     id: i32,
     title: String,
@@ -20,14 +28,6 @@ impl ResourceIdentifiable for Article {
         self.id.to_string()
     }
 }
-
-#[derive(Serialize)]
-struct ArticleLinkMeta {
-    message: &'static str
-}
-
-const ARTICLE_LINK_META_MESSAGE: &'static str = "It works!";
-const ARTICLE_LINK_META: ArticleLinkMeta = ArticleLinkMeta { message: ARTICLE_LINK_META_MESSAGE };
 
 impl Linkify for Article {
     fn get_links() -> Vec<LinksObject> {
@@ -110,3 +110,5 @@ impl ResourceIdentifiable for ProofReader {
         self.0.get_id()
     }
 }
+
+impl Linkify for ProofReader {}

@@ -1,5 +1,6 @@
 use crate::lib::*;
 use erased_serde::{Serialize as RefSerialize};
+use crate::data::ResourceIdentifiable;
 
 /*
 pub struct LinksMeta(Box<dyn Serialize>);
@@ -40,10 +41,6 @@ pub enum LinksObject {
 // TODO derive version? Maybe for the simple URL case
 // TODO make return type an Option? Or own enum?
 pub trait Linkify {
-    fn get_links() -> Vec<LinksObject>;
-}
-
-impl<T> Linkify for T {
     fn get_links() -> Vec<LinksObject> {
         vec![]
     }
@@ -53,6 +50,6 @@ impl<T> Linkify for T {
 
 // TODO can we use this approach, by have some LinkifySelf trait
 // TODO macro_stuff? Something like: #[derive(HaveLink, To)]
-trait HaveLink<To: Linkify> {
-    const KEY: Key;
-}
+//trait HaveLink<To: Linkify> {
+//    const KEY: Key;
+//}

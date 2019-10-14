@@ -10,4 +10,11 @@ edition = "2018"
 serde = { version = "1.0", features = ["derive"] }
 erased-serde = "0.3"
 rocket = "0.4.2"
+rocket_jsonapi_derive = { optional = true, path = "../rocket_jsonapi_derive" }
 
+[dev-dependencies]
+rocket_jsonapi_derive = { path = "../rocket_jsonapi_derive" }
+
+[features]
+# Provide derive(Linkify, Relationships, ...) macros.
+derive = ["rocket_jsonapi_derive"]

@@ -7,8 +7,8 @@ use syn;
 fn impl_linkify(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let gen = quote! {
-        impl Linkify for #name {
-            fn get_links() -> Vec<LinksObject> {
+        impl rocket_jsonapi::links::Linkify for #name {
+            fn get_links() -> Vec<rocket_jsonapi::links::LinksObject> {
                 vec![]
             }
         }

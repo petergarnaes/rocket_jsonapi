@@ -1,13 +1,5 @@
 #![feature(specialization)]
 #![feature(associated_type_defaults)]
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
-
 mod core;
 
 mod lib {
@@ -18,7 +10,11 @@ mod lib {
 
 pub mod info;
 pub mod response;
+
+// Exposing Linkify on root level path, because macros can only be on root level
 pub mod links;
+pub use links::Linkify;
+
 pub mod data;
 pub mod relationship;
 pub mod meta;
@@ -33,3 +29,11 @@ pub mod meta;
 // https://www.reddit.com/r/rust/comments/4jgvho/idiomatic_way_to_implement_optional_arguments/
 
 // Måske kan lidt trait implementationer sammen med noget macro magi lave klisteret?
+
+#[cfg(feature = "rocket_jsonapi_derive")]
+#[allow(unused_imports)]
+#[macro_use]
+extern crate rocket_jsonapi_derive;
+#[cfg(feature = "rocket_jsonapi_derive")]
+#[doc(hidden)]
+pub use rocket_jsonapi_derive::*;

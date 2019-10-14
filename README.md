@@ -14,7 +14,7 @@ At the same time, it is possible to fully enrich the responses with all the opti
 
 ## Requirements
 
-Because this crate uses rocket and the `specialization` feature, rust nightly is needed.
+This library uses Rust2018 syntax. Because this crate uses rocket and the `specialization` feature, rust nightly is needed.
 
 ## Usage example
 

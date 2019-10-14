@@ -3,7 +3,6 @@ use rocket_jsonapi::data::{ResourceIdentifiable, PrimaryObjectType, ResourceObje
 use rocket_jsonapi::links::{Linkify, LinksObject, LinkObject};
 use rocket_jsonapi::links::LinksObject::{Object};
 use rocket_jsonapi::relationship::{HaveRelationship, RelationObjectify, AllRelationships, RelationObject};
-use rocket_jsonapi::data::ResourceObjectType::{Single, Multiple};
 
 #[derive(Serialize)]
 struct ArticleLinkMeta {

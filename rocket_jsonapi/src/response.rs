@@ -20,6 +20,7 @@ Serialize {
             serializer.serialize_some(&err)
         }
     }
+    // TODO handle json_api field
 }
 
 pub struct JsonApiResponse<Data: ResourceIdentifiable, Included, Error>(pub Result<JsonApiPrimaryDataObject<Data, Included>, Error>);

@@ -2,17 +2,6 @@ use crate::lib::*;
 use erased_serde::{Serialize as RefSerialize};
 use crate::data::ResourceIdentifiable;
 
-/*
-pub struct LinksMeta(Box<dyn Serialize>);
-
-impl Serialize for LinksMeta {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
-        S: Serializer {
-        (*self.0).serialize()
-    }
-}
-*/
-
 type Key = String;
 type Url = String;
 
@@ -26,11 +15,6 @@ impl LinkObject {
     pub fn new(href: Url, meta: Box<RefSerialize>) -> Self {
         LinkObject {href, meta }
     }
-}
-
-#[derive(Serialize)]
-pub struct JsonApiLinks {
-
 }
 
 pub enum LinksObject {

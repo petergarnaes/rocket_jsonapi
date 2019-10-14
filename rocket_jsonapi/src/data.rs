@@ -1,5 +1,5 @@
 use crate::lib::*;
-use crate::links::{JsonApiLinks, Linkify};
+use crate::links::{Linkify};
 use crate::relationship::RelationObject;
 use crate::core::data_object::create_data_object;
 
@@ -50,13 +50,6 @@ pub enum ResourceObjectType<Data> {
     NoResource
 }
 
-// Should _probably_ not be used?
-pub trait ResourceObjectable<Data: ResourceIdentifiable> {
-    fn get_data(&self) -> PrimaryObjectType<Data>;
-    fn get_link(&self) -> Option<JsonApiLinks>;
-    //fn get_relationships(&self) -> Option<Relationships>;
-}
-
 pub enum PrimaryObjectType<Data: ResourceIdentifiable> {
     Single(Data),
     Multiple(Vec<Data>)
@@ -65,7 +58,7 @@ pub enum PrimaryObjectType<Data: ResourceIdentifiable> {
 
 pub struct JsonApiResourceObject<Data: ResourceIdentifiable> {
     pub data: PrimaryObjectType<Data>,
-    pub links: Option<JsonApiLinks>,
+    //pub links: Option<JsonApiLinks>,
     // TODO how do we figure out the type of the relationship?
     //pub relationships: Option<RelationObject>,
     //pub relationshipz: Option<Vec<Box<dyn Relationshipify>>>

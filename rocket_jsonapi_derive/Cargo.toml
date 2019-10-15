@@ -10,8 +10,9 @@ name = "rocket_jsonapi_derive"
 proc-macro = true
 
 [dependencies]
-syn = "0.14.4"
-quote = "0.6.3"
+proc-macro2 = "1.0"
+syn = "1.0.5"
+quote = "1.0.2"
 
 [dev-dependencies]
 rocket_jsonapi = { path = "../rocket_jsonapi" }

@@ -1,20 +1,25 @@
 # `rocket_jsonapi` - JSON:API implementation for Rocket.rs
 
 [JSON:API](https://jsonapi.org/) is a specification for how a RESTful json api should act. This library is an 
-implementation for [Rocket.rs](https://rocket.rs/), such that request and response parsing follow all conventions laid out in the 
-specification.
+implementation for [Rocket.rs](https://rocket.rs/), such that request and response parsing follow all conventions laid 
+out in the specification, through type safety.
 
-`rocket_jsonapi` puts emphasis on correctness and following all conventions.
+This crate uses a trait based approach for constructing valid JSON:API responses. This means that responses are enriched
+by implementing traits for fields like `links`, `meta` etc. on the data-objects that are being responded.
 
-This crate uses the `specialization` feature, to give multiple options for what, and how much of the optional features 
-you want to include.
+Through the `rocket_jsonapi_derive` crate, fields that should not show up (ie. empty implementations) can be derived.
+The crate can also generate basic implementations, like static link responses, static relationships etc.
+[More about `rocket_jsonapi_derive` macros](TODO).
 
-This crate to be easy to get started with, so it is quick and easy to build _correct_ and conventional webservices.
-At the same time, it is possible to fully enrich the responses with all the optional fields.
+This crate aims for easy onboarding, gradual enrichment of responses, specification adherence, reducing boilerplate
+and hiding specification details.
+
+## Documentation
 
 ## Requirements
 
-This library uses Rust2018 syntax. Because this crate uses rocket and the `specialization` feature, rust nightly is needed.
+This library uses Rust-2018 syntax. Because this crate uses rocket and the `specialization` feature, rust nightly is
+ needed.
 
 ## Usage example
 

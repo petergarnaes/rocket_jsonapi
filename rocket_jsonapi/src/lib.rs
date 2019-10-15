@@ -16,6 +16,7 @@ pub mod links;
 pub use links::Linkify;
 
 pub mod data;
+pub use data::ResourceIdentifiable;
 pub mod relationship;
 pub mod meta;
 

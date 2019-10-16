@@ -1,6 +1,6 @@
 use crate::lib::*;
 use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
-use crate::data::ResourceObjectType::{Single, Multiple, NoResource};
+use crate::data::ResourceObjectType::{Single};
 
 #[derive(Serialize)]
 pub struct DataObject<'a, Data: Serialize> {

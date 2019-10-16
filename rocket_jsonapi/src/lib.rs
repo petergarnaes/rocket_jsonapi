@@ -18,7 +18,6 @@ pub use links::Linkify;
 pub mod data;
 pub use data::ResourceIdentifiable;
 pub mod relationship;
-pub mod meta;
 
 // Der skal filosoferes over hvordan vi med statisk opbygning kan lave en dynamisk data struktur.
 // Måske virkelig abuse dyn Trait

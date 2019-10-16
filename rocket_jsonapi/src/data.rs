@@ -1,6 +1,5 @@
 use crate::lib::*;
 use crate::links::{Linkify};
-use crate::relationship::RelationObject;
 use crate::core::data_object::create_data_object;
 
 pub trait ResourceIdentifiable {

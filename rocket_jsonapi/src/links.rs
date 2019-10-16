@@ -1,6 +1,5 @@
 use crate::lib::*;
 use erased_serde::{Serialize as RefSerialize};
-use crate::data::ResourceIdentifiable;
 
 type Key = String;
 type Url = String;
@@ -8,11 +7,11 @@ type Url = String;
 #[derive(Serialize)]
 pub struct LinkObject {
     pub href: Url,
-    pub meta: Box<RefSerialize>
+    pub meta: Box<dyn RefSerialize>
 }
 
 impl LinkObject {
-    pub fn new(href: Url, meta: Box<RefSerialize>) -> Self {
+    pub fn new(href: Url, meta: Box<dyn RefSerialize>) -> Self {
         LinkObject {href, meta }
     }
 }

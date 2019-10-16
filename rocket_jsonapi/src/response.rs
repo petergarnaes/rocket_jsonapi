@@ -1,8 +1,6 @@
 use crate::lib::*;
-use crate::info::JsonApi;
 use crate::data::*;
 use crate::core::data_object::create_data_object;
-use crate::relationship::{HaveRelationship, AllRelationships};
 use crate::links::Linkify;
 
 fn ser<S, T, I, E, J>(

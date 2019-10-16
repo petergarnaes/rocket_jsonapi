@@ -1,9 +1,6 @@
-use crate::lib::*;
 use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
 use crate::core::data_object::to_resource_identifier;
-use std::marker::PhantomData;
-use crate::data::ResourceObjectType::{NoResource, Single, Multiple};
-use crate::meta::Metafiable;
+use crate::data::ResourceObjectType::{Single};
 use crate::links::Linkify;
 
 //pub type Relationship = Box<dyn ResourceIdentifiable>;

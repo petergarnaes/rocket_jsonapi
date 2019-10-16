@@ -6,3 +6,7 @@
  - macro hygiene
 
 ## API stuff
+
+## Documentation stuff
+
+ - All of it :(

@@ -1,6 +1,6 @@
-use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
 use crate::core::data_object::to_resource_identifier;
-use crate::data::ResourceObjectType::{Single};
+use crate::data::ResourceObjectType::Single;
+use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
 use crate::links::Linkify;
 
 //pub type Relationship = Box<dyn ResourceIdentifiable>;
@@ -8,7 +8,7 @@ use crate::links::Linkify;
 
 pub struct RelationObject {
     data: ResourceObjectType<ResourceIdentifier>,
-    links: String
+    links: String,
 }
 
 pub trait HaveRelationship<To> {
@@ -37,11 +37,21 @@ impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable, Fr
 }
 */
 
-impl<From, To> RelationObjectify<To> for From where To: ResourceIdentifiable + Linkify, From: HaveRelationship<To> {
+impl<From, To> RelationObjectify<To> for From
+where
+    To: ResourceIdentifiable + Linkify,
+    From: HaveRelationship<To>,
+{
     fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
-        RelationObject { data: Single(ResourceIdentifier {id: rel.get_id(), object_type: rel.get_type() }), links: "".to_owned() }
+        RelationObject {
+            data: Single(ResourceIdentifier {
+                id: rel.get_id().to_string(),
+                object_type: rel.get_type(),
+            }),
+            links: "".to_owned(),
+        }
     }
 }
 

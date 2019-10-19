@@ -1,31 +1,44 @@
-use crate::lib::*;
-use crate::data::*;
 use crate::core::data_object::create_data_object;
+use crate::data::*;
+use crate::lib::*;
 use crate::links::Linkify;
 
 fn ser<S, T, I, E, J>(
     serializer: S,
     result: &Result<JsonApiPrimaryDataObject<T, I>, E>,
-    json_api: Option<J>) -> Result<S::Ok, S::Error>
-    where S: Serializer, T: Serialize + ResourceIdentifiable + Linkify, I: Serialize, E: Serialize, J:
-Serialize {
+    json_api: Option<J>,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: Serialize + ResourceIdentifiable + Linkify,
+    I: Serialize,
+    E: Serialize,
+    J: Serialize,
+{
     // TODO length aka. number of fields must be correct
     match result {
-        Ok(api_result) => {
-            serializer.serialize_some(&api_result)
-        },
-        Err(err) => {
-            serializer.serialize_some(&err)
-        }
+        Ok(api_result) => serializer.serialize_some(&api_result),
+        Err(err) => serializer.serialize_some(&err),
     }
     // TODO handle json_api field
 }
 
-pub struct JsonApiResponse<Data: ResourceIdentifiable, Included, Error>(pub Result<JsonApiPrimaryDataObject<Data, Included>, Error>);
+pub struct JsonApiResponse<Data, Included, Error>(
+    pub Result<JsonApiPrimaryDataObject<Data, Included>, Error>,
+)
+where
+    Data: ResourceIdentifiable;
 
 impl<Data, Included, Error> Serialize for JsonApiResponse<Data, Included, Error>
-    where Data: Serialize + ResourceIdentifiable + Linkify, Included: Serialize, Error: Serialize {
-    default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+where
+    Data: Serialize + ResourceIdentifiable + Linkify,
+    Included: Serialize,
+    Error: Serialize,
+{
+    default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         ser(serializer, &self.0, None::<()>)
     }
 }

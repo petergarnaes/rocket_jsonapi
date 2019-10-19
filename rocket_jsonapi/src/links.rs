@@ -1,5 +1,5 @@
 use crate::lib::*;
-use erased_serde::{Serialize as RefSerialize};
+use erased_serde::Serialize as RefSerialize;
 
 type Key = String;
 type Url = String;
@@ -7,18 +7,18 @@ type Url = String;
 #[derive(Serialize)]
 pub struct LinkObject {
     pub href: Url,
-    pub meta: Box<dyn RefSerialize>
+    pub meta: Box<dyn RefSerialize>,
 }
 
 impl LinkObject {
     pub fn new(href: Url, meta: Box<dyn RefSerialize>) -> Self {
-        LinkObject {href, meta }
+        LinkObject { href, meta }
     }
 }
 
 pub enum LinksObject {
     Url(Key, Url),
-    Object(Key, LinkObject)
+    Object(Key, LinkObject),
 }
 
 // TODO derive version? Maybe for the simple URL case

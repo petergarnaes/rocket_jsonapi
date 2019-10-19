@@ -3,8 +3,8 @@
 mod core;
 
 mod lib {
-    pub use serde::{Serialize, Serializer, Deserialize, Deserializer};
-    pub use serde::ser::{SerializeStruct};
+    pub use serde::ser::SerializeStruct;
+    pub use serde::{Deserialize, Deserializer, Serialize, Serializer};
     // Possible to include core modules if we want them globally
 }
 

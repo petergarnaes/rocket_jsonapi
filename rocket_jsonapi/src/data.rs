@@ -1,10 +1,12 @@
-use crate::lib::*;
-use crate::links::{Linkify};
 use crate::core::data_object::create_data_object;
+use crate::lib::*;
+use crate::links::Linkify;
 
 pub trait ResourceIdentifiable {
+    type IdType: ToString;
+
     fn get_type(&self) -> &'static str;
-    fn get_id(&self) -> String;
+    fn get_id(&self) -> &Self::IdType;
 }
 
 /*
@@ -24,36 +26,40 @@ impl ResourceIdentifiable for Box<dyn ResourceIdentifiable> {
 pub struct ResourceIdentifier {
     pub id: String,
     #[serde(rename = "type")]
-    pub object_type: &'static str
+    pub object_type: &'static str,
 }
 
 impl ResourceIdentifier {
     pub fn create_identifier<T: ResourceIdentifiable>(resource: &T) -> Self {
-        ResourceIdentifier { id: resource.get_id(), object_type: resource.get_type() }
+        ResourceIdentifier {
+            id: resource.get_id().to_string(),
+            object_type: resource.get_type(),
+        }
     }
 }
 
 impl ResourceIdentifiable for ResourceIdentifier {
+    type IdType = String;
+
     fn get_type(&self) -> &'static str {
         self.object_type
     }
 
-    fn get_id(&self) -> String {
-        self.id.clone()
+    fn get_id(&self) -> &String {
+        &self.id
     }
 }
 
 pub enum ResourceObjectType<Data> {
     Single(Data),
     Multiple(Vec<Data>),
-    NoResource
+    NoResource,
 }
 
 pub enum PrimaryObjectType<Data: ResourceIdentifiable> {
     Single(Data),
-    Multiple(Vec<Data>)
+    Multiple(Vec<Data>),
 }
-
 
 pub struct JsonApiResourceObject<Data: ResourceIdentifiable> {
     pub data: PrimaryObjectType<Data>,
@@ -74,21 +80,33 @@ pub struct JsonApiPrimaryDataObject<Data: ResourceIdentifiable, Included> {
     //pub relationships: Option<Vec<Box<dyn ResourceIdentifiable>>>
 }
 
-impl<Data: ResourceIdentifiable> JsonApiPrimaryDataObject<Data, ()> {
+impl<'a, Data: ResourceIdentifiable> JsonApiPrimaryDataObject<Data, ()> {
     pub fn from_data(data: PrimaryObjectType<Data>) -> JsonApiPrimaryDataObject<Data, ()> {
         //JsonApiPrimaryDataObject {data, links: None, included: None, relationships: None::<_> }
-        JsonApiPrimaryDataObject {data, included: None }
+        JsonApiPrimaryDataObject {
+            data,
+            included: None,
+        }
     }
     pub fn from_data_links(data: PrimaryObjectType<Data>) -> JsonApiPrimaryDataObject<Data, ()> {
         //JsonApiPrimaryDataObject { data, links: Some(links), included: None, relationships: None::<_> }
-        JsonApiPrimaryDataObject { data, included: None }
+        JsonApiPrimaryDataObject {
+            data,
+            included: None,
+        }
     }
 }
 
 impl<Data: ResourceIdentifiable, Included> JsonApiPrimaryDataObject<Data, Included> {
-    pub fn from_data_links_included(data: PrimaryObjectType<Data>, included: Vec<Included>) -> JsonApiPrimaryDataObject<Data, Included> {
+    pub fn from_data_links_included(
+        data: PrimaryObjectType<Data>,
+        included: Vec<Included>,
+    ) -> JsonApiPrimaryDataObject<Data, Included> {
         //JsonApiPrimaryDataObject { data, links: Some(links), included: Some(included), relationships: None::<_> }
-        JsonApiPrimaryDataObject { data, included: Some(included) }
+        JsonApiPrimaryDataObject {
+            data,
+            included: Some(included),
+        }
     }
 }
 
@@ -123,13 +141,19 @@ impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
 // corresponding in relationship). It would also make gradual and modular implementation possible,
 // ie. only implement Linkify, or only relationship, etc.
 impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
-    where Data: Serialize + ResourceIdentifiable + Linkify, Included: Serialize {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+where
+    Data: Serialize + ResourceIdentifiable + Linkify,
+    Included: Serialize,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         let mut state = serializer.serialize_struct("JsonApiPrimaryDataObject", 1)?;
         match &self.data {
             PrimaryObjectType::Single(data) => {
                 state.serialize_field("data", &create_data_object(data))?;
-            },
+            }
             PrimaryObjectType::Multiple(data_vec) => {
                 let data_object_vec = data_vec.iter().map(create_data_object).collect::<Vec<_>>();
                 state.serialize_field("data", &data_object_vec)?;
@@ -139,7 +163,7 @@ impl<Data, Included> Serialize for JsonApiPrimaryDataObject<Data, Included>
         match links.len() {
             0 => {
                 // TODO do not parse the links field
-            },
+            }
             _ => {
                 // TODO parse each element as a nested object in parent links object, use provided key
             }

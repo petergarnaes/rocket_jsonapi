@@ -8,7 +8,7 @@ fn test_gen_linkify_simple() {
     #[derive(Linkify)]
     struct Simple {
         name: String,
-        count: u32
+        count: u32,
     }
     assert_linkify::<Simple>();
 }
@@ -18,12 +18,12 @@ fn test_gen_resource_identifiable_simple() {
     #[derive(ResourceIdentifiable)]
     struct SimpleResource {
         id: String,
-        bob: Box<String>
+        bob: Box<String>,
     }
     assert_resource_identifiable::<SimpleResource>();
     let simple_resource = SimpleResource {
         id: "1".to_string(),
-        bob: Box::new("bob".to_string())
+        bob: Box::new("bob".to_string()),
     };
     assert_eq!("SimpleResource", simple_resource.get_type());
     assert_eq!("1", simple_resource.get_id());
@@ -35,12 +35,12 @@ fn test_gen_resource_identifiable_custom_type() {
     #[resource_ident_type = "test"]
     struct SimpleResourceCustomType {
         id: String,
-        bob: Box<String>
+        bob: Box<String>,
     }
     assert_resource_identifiable::<SimpleResourceCustomType>();
     let simple_resource = SimpleResourceCustomType {
         id: "1".to_string(),
-        bob: Box::new("bob".to_string())
+        bob: Box::new("bob".to_string()),
     };
     assert_eq!("test", simple_resource.get_type());
     assert_eq!("1", simple_resource.get_id());

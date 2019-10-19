@@ -1,13 +1,12 @@
 extern crate proc_macro;
 
 use crate::proc_macro::TokenStream;
+use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn;
-use syn::{MetaNameValue, Field};
-use syn::Meta::{NameValue};
-use syn::Lit::{Str};
-use proc_macro2::{Ident, Span};
-use syn::ext::IdentExt;
+use syn::Lit::Str;
+use syn::Meta::NameValue;
+use syn::{MetaNameValue};
 
 type ErrorMessage = &'static str;
 
@@ -38,26 +37,36 @@ fn ident_type_from(name: &Ident) -> Ident {
 
 const ID: &'static str = "id";
 
-fn impl_resource_identifiable(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, ErrorMessage> {
+fn impl_resource_identifiable(
+    ast: syn::DeriveInput,
+) -> Result<proc_macro2::TokenStream, ErrorMessage> {
     let name = &ast.ident;
-    let mut name_values = &ast.attrs.iter().filter_map(|attr| {
-        attr.parse_meta().ok()
-    }).filter_map(|m| match m {
-        NameValue(meta) => Some(meta),
-        _ => None
-    }).collect::<Vec<MetaNameValue>>();
+    let mut name_values = &ast
+        .attrs
+        .iter()
+        .filter_map(|attr| attr.parse_meta().ok())
+        .filter_map(|m| match m {
+            NameValue(meta) => Some(meta),
+            _ => None,
+        })
+        .collect::<Vec<MetaNameValue>>();
     let id_field = match &ast.data {
         syn::Data::Struct(data_struct) => match &data_struct.fields {
             syn::Fields::Named(fields) => Ok(fields),
-            _ => Err("ResourceIdentifiable can only be derived from a named struct, not tuple \
-            struct or unit struct")
+            _ => Err(
+                "ResourceIdentifiable can only be derived from a named struct, not tuple \
+                 struct or unit struct",
+            ),
         },
-        _ => Err("ResourceIdentifiable can only be derived from a struct, not enum or union")
-    }?.named
-        .iter()
-        .find(|f| format!("{}", f.ident.as_ref().unwrap()).as_str() == ID)
-        .ok_or("If ud not specified through `resource_ident_id` attribute, there must be a \
-        field in struct named: `id`")?;
+        _ => Err("ResourceIdentifiable can only be derived from a struct, not enum or union"),
+    }?
+    .named
+    .iter()
+    .find(|f| format!("{}", f.ident.as_ref().unwrap()).as_str() == ID)
+    .ok_or(
+        "If ud not specified through `resource_ident_id` attribute, there must be a \
+         field in struct named: `id`",
+    )?;
     // TODO handle id_field type
     /*
     match &id_field.ty {
@@ -68,15 +77,19 @@ fn impl_resource_identifiable(ast: syn::DeriveInput) -> Result<proc_macro2::Toke
     }
     */
     // TODO refactor, maybe share with `resource_ident_type`
-    let resource_ident_id = name_values.iter().find(|m| m.path.is_ident("resource_ident_id"))
+    let resource_ident_id = name_values
+        .iter()
+        .find(|m| m.path.is_ident("resource_ident_id"))
         .map_or(ident_id(), |m| match &m.lit {
             Str(literal) => Ident::new(&literal.value(), Span::call_site()),
-            _ => ident_id()
+            _ => ident_id(),
         });
-    let resource_ident_type = name_values.iter().find(|m| m.path.is_ident("resource_ident_type"))
+    let resource_ident_type = name_values
+        .iter()
+        .find(|m| m.path.is_ident("resource_ident_type"))
         .map_or(ident_type_from(&name), |m| match &m.lit {
             Str(literal) => Ident::new(&literal.value(), Span::call_site()),
-            _ => ident_type_from(&name)
+            _ => ident_type_from(&name),
         });
     // TODO resource_ident_id should look at the id field type, and properly convert if possible
     let gen = quote! {
@@ -92,7 +105,10 @@ fn impl_resource_identifiable(ast: syn::DeriveInput) -> Result<proc_macro2::Toke
     Ok(gen)
 }
 
-#[proc_macro_derive(ResourceIdentifiable, attributes(resource_ident_id, resource_ident_type))]
+#[proc_macro_derive(
+    ResourceIdentifiable,
+    attributes(resource_ident_id, resource_ident_type)
+)]
 pub fn resource_identifiable_derive(input: TokenStream) -> TokenStream {
     expand_proc_macro(input, impl_resource_identifiable)
 }

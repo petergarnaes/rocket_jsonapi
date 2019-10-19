@@ -38,6 +38,15 @@ impl ResourceIdentifier {
     }
 }
 
+impl<T: ResourceIdentifiable> From<&T> for ResourceIdentifier {
+    fn from(resource: &T) -> Self {
+        ResourceIdentifier {
+            id: resource.get_id().to_string(),
+            object_type: resource.get_type(),
+        }
+    }
+}
+
 impl ResourceIdentifiable for ResourceIdentifier {
     type IdType = String;
 

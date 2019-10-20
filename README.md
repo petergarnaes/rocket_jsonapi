@@ -2,12 +2,13 @@
 
 [JSON:API](https://jsonapi.org/) is a specification for how a RESTful json api should act. This library is an 
 implementation for [Rocket.rs](https://rocket.rs/), such that request and response parsing follow all conventions laid 
-out in the specification, through type safety.
+out in the specification, by using type safety.
 
 This crate uses a trait based approach for constructing valid JSON:API responses. This means that responses are enriched
 by implementing traits for fields like `links`, `meta` etc. on the data-objects that are being responded.
 
-Through the `rocket_jsonapi_derive` crate, fields that should not show up (ie. empty implementations) can be derived.
+This framework requires a lot of implementations on the data objects returned, for things like `links`, 
+`meta`, etc. Through the `rocket_jsonapi_derive` crate, these traits can be easily derived.
 The crate can also generate basic implementations, like static link responses, static relationships etc.
 [More about `rocket_jsonapi_derive` macros](TODO).
 

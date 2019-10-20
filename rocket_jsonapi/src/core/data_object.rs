@@ -20,23 +20,3 @@ where
         attributes: d,
     }
 }
-
-pub fn to_resource_identifier<R: ResourceIdentifiable>(
-    res: &R,
-) -> ResourceObjectType<ResourceIdentifier> {
-    Single(ResourceIdentifier {
-        id: res.get_id().to_string(),
-        object_type: res.get_type(),
-    })
-}
-/*
-pub fn to_resource_identifier<R: ResourceIdentifiable>(res: &ResourceObjectType<R>) -> ResourceObjectType<ResourceIdentifier> {
-    match res {
-        Single(resource) => Single(ResourceIdentifier::create_identifier(resource)),
-        Multiple(resource_vec) => Multiple(
-            resource_vec.iter().map(|r| ResourceIdentifier::create_identifier(r)).collect()
-        ),
-        NoResource => NoResource
-    }
-}
-*/

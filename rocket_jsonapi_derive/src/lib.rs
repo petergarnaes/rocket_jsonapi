@@ -6,7 +6,7 @@ use quote::quote;
 use syn;
 use syn::Lit::Str;
 use syn::Meta::NameValue;
-use syn::{MetaNameValue};
+use syn::MetaNameValue;
 
 type ErrorMessage = &'static str;
 

@@ -3,36 +3,32 @@ use crate::data::*;
 use crate::lib::*;
 use crate::links::Linkify;
 
-fn ser<S, T, I, E, J>(
+fn ser<S, T, E, J>(
     serializer: S,
-    result: &Result<JsonApiPrimaryDataObject<T, I>, E>,
+    result: &Result<T, E>,
     json_api: Option<J>,
 ) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
     T: Serialize + ResourceIdentifiable + Linkify,
-    I: Serialize,
     E: Serialize,
     J: Serialize,
 {
-    // TODO length aka. number of fields must be correct
     match result {
-        Ok(api_result) => serializer.serialize_some(&api_result),
+        Ok(api_result) => serializer.serialize_some(&JsonApiPrimaryDataObject(api_result)),
         Err(err) => serializer.serialize_some(&err),
     }
     // TODO handle json_api field
 }
 
-pub struct JsonApiResponse<Data, Included, Error>(
-    pub Result<JsonApiPrimaryDataObject<Data, Included>, Error>,
-)
+pub struct JsonApiResponse<Data, Error>(pub Result<Data, Error>)
 where
     Data: ResourceIdentifiable;
 
-impl<Data, Included, Error> Serialize for JsonApiResponse<Data, Included, Error>
+impl<Data, Error> Serialize for JsonApiResponse<Data, Error>
 where
+    // TODO implement Includify
     Data: Serialize + ResourceIdentifiable + Linkify,
-    Included: Serialize,
     Error: Serialize,
 {
     default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

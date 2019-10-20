@@ -1,4 +1,3 @@
-use crate::core::data_object::to_resource_identifier;
 use crate::data::ResourceObjectType::Single;
 use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
 use crate::links::Linkify;

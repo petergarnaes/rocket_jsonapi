@@ -13,8 +13,8 @@
  - Remove all warnings in `rocket_jsonapi` crate, lots of unused stuff.
  - Disable unused warnings in `test_suite` crate.
  - Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
- - Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
- - Fix any tests
+ - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
+ - Deriving `ResourceIdentifiable` should handle when `IdType=&str`, can copying be avoided?
  - Write serialization tests of all the newtypes: `ResourceIdent`, `JsonApiPrimaryDataObject` and
   `JsonApiPrimaryDataObjectArray`
  - Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped

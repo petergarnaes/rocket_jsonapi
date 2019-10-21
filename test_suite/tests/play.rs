@@ -84,8 +84,8 @@ impl ResourceIdentifiable for Person {
         &"person"
     }
 
-    fn get_id(&self) -> String {
-        self.id.to_string()
+    fn get_id(&self) -> &Self::IdType {
+        &self.id
     }
 }
 
@@ -105,7 +105,7 @@ impl ResourceIdentifiable for Author {
         self.0.get_type()
     }
 
-    fn get_id(&self) -> String {
+    fn get_id(&self) -> &Self::IdType {
         self.0.get_id()
     }
 }
@@ -125,7 +125,7 @@ impl ResourceIdentifiable for ProofReader {
         self.0.get_type()
     }
 
-    fn get_id(&self) -> String {
+    fn get_id(&self) -> &Self::IdType {
         self.0.get_id()
     }
 }

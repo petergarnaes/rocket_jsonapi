@@ -3,12 +3,15 @@ extern crate proc_macro;
 use crate::proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
+use std::error::Error;
+use std::fmt;
 use syn;
+use syn::export::Formatter;
 use syn::Lit::Str;
 use syn::Meta::NameValue;
 use syn::MetaNameValue;
 
-type ErrorMessage = &'static str;
+type ErrorMessage = String;
 
 fn impl_linkify(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, ErrorMessage> {
     let name = &ast.ident;
@@ -35,7 +38,37 @@ fn ident_type_from(name: &Ident) -> Ident {
     Ident::new(&format!("{}", name), name.span())
 }
 
-const ID: &'static str = "id";
+// TODO pretty errors something like this
+/*
+#[derive(Debug)]
+enum ResourceIdentifiableDeriveError {
+    NotNamedStruct,
+    NotStruct,
+    InvalidStruct {
+        struct_name: String,
+        field_name: String,
+    },
+}
+
+impl fmt::Display for ResourceIdentifiableDeriveError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match &self {
+                ResourceIdentifiableDeriveError::NotNamedStruct => "TODO1",
+                ResourceIdentifiableDeriveError::NotStruct => "TODO2",
+                ResourceIdentifiableDeriveError::InvalidStruct {
+                    ref struct_name,
+                    ref field_name,
+                } => "TODO3",
+            }
+        )
+    }
+}
+
+impl Error for ResourceIdentifiableDeriveError {}
+*/
 
 fn impl_resource_identifiable(
     ast: syn::DeriveInput,
@@ -50,40 +83,7 @@ fn impl_resource_identifiable(
             _ => None,
         })
         .collect::<Vec<MetaNameValue>>();
-    let id_field = match &ast.data {
-        syn::Data::Struct(data_struct) => match &data_struct.fields {
-            syn::Fields::Named(fields) => Ok(fields),
-            _ => Err(
-                "ResourceIdentifiable can only be derived from a named struct, not tuple \
-                 struct or unit struct",
-            ),
-        },
-        _ => Err("ResourceIdentifiable can only be derived from a struct, not enum or union"),
-    }?
-    .named
-    .iter()
-    .find(|f| format!("{}", f.ident.as_ref().unwrap()).as_str() == ID)
-    .ok_or(
-        "If ud not specified through `resource_ident_id` attribute, there must be a \
-         field in struct named: `id`",
-    )?;
-    // TODO handle id_field type
-    /*
-    match &id_field.ty {
-        syn::Type::Path(p) => match format!("{}", p.path.get_ident().unwrap()).as_str() {
-            "String" => ,
-        },
-        _ => {println!("Something else");}
-    }
-    */
     // TODO refactor, maybe share with `resource_ident_type`
-    let resource_ident_id = name_values
-        .iter()
-        .find(|m| m.path.is_ident("resource_ident_id"))
-        .map_or(ident_id(), |m| match &m.lit {
-            Str(literal) => Ident::new(&literal.value(), Span::call_site()),
-            _ => ident_id(),
-        });
     let resource_ident_type = name_values
         .iter()
         .find(|m| m.path.is_ident("resource_ident_type"))
@@ -91,14 +91,45 @@ fn impl_resource_identifiable(
             Str(literal) => Ident::new(&literal.value(), Span::call_site()),
             _ => ident_type_from(&name),
         });
-    // TODO resource_ident_id should look at the id field type, and properly convert if possible
+    let resource_ident_id = name_values
+        .iter()
+        .find(|m| m.path.is_ident("resource_ident_id"))
+        .map_or(ident_id(), |m| match &m.lit {
+            Str(literal) => Ident::new(&literal.value(), Span::call_site()),
+            _ => ident_id(),
+        });
+    let id_field = match &ast.data {
+        syn::Data::Struct(data_struct) => match &data_struct.fields {
+            syn::Fields::Named(fields) => Ok(fields),
+            _ => Err("ResourceIdentifiable must be derived from a named struct".to_string()),
+        },
+        _ => Err("ResourceIdentifiable must be derived from a struct".to_string()),
+    }?
+    .named
+    .iter()
+    .find(|f| {
+        f.ident
+            .as_ref()
+            .map(|i| i.eq(&resource_ident_id))
+            .eq(&Some(true))
+    })
+    .ok_or_else(|| {
+        format!(
+            "{} does not have an id field named {}",
+            resource_ident_type, resource_ident_id
+        )
+    })?;
+    let id_type = &id_field.ty;
+    // Defining inner macro for each expansion is ugly
     let gen = quote! {
         impl rocket_jsonapi::data::ResourceIdentifiable for #name {
+            type IdType = #id_type;
+
             fn get_type(&self) -> &'static str {
                 &stringify!(#resource_ident_type)
             }
-            fn get_id(&self) -> String {
-                self.#resource_ident_id.to_string()
+            fn get_id(&self) -> &Self::IdType {
+                &self.#resource_ident_id
             }
         }
     };

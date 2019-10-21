@@ -4,14 +4,22 @@ use crate::proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use std::error::Error;
-use std::fmt;
 use syn;
 use syn::export::Formatter;
 use syn::Lit::Str;
 use syn::Meta::NameValue;
 use syn::MetaNameValue;
 
-type ErrorMessage = String;
+#[derive(Debug)]
+struct ErrorMessage(String);
+
+impl std::fmt::Display for ErrorMessage {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl Error for ErrorMessage {}
 
 fn impl_linkify(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, ErrorMessage> {
     let name = &ast.ident;
@@ -101,9 +109,13 @@ fn impl_resource_identifiable(
     let id_field = match &ast.data {
         syn::Data::Struct(data_struct) => match &data_struct.fields {
             syn::Fields::Named(fields) => Ok(fields),
-            _ => Err("ResourceIdentifiable must be derived from a named struct".to_string()),
+            _ => Err(ErrorMessage(
+                "ResourceIdentifiable must be derived from a named struct".to_string(),
+            )),
         },
-        _ => Err("ResourceIdentifiable must be derived from a struct".to_string()),
+        _ => Err(ErrorMessage(
+            "ResourceIdentifiable must be derived from a struct".to_string(),
+        )),
     }?
     .named
     .iter()
@@ -114,10 +126,10 @@ fn impl_resource_identifiable(
             .eq(&Some(true))
     })
     .ok_or_else(|| {
-        format!(
+        ErrorMessage(format!(
             "{} does not have an id field named {}",
             resource_ident_type, resource_ident_id
-        )
+        ))
     })?;
     let id_type = &id_field.ty;
     // Defining inner macro for each expansion is ugly
@@ -145,9 +157,9 @@ pub fn resource_identifiable_derive(input: TokenStream) -> TokenStream {
 }
 
 // Thanks to diesel
-fn expand_proc_macro<T: syn::parse::Parse>(
+fn expand_proc_macro<T: syn::parse::Parse, E: Error>(
     input: TokenStream,
-    f: fn(T) -> Result<proc_macro2::TokenStream, ErrorMessage>,
+    f: fn(T) -> Result<proc_macro2::TokenStream, E>,
 ) -> TokenStream {
     let item = syn::parse(input).unwrap();
     match f(item) {

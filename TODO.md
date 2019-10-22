@@ -11,7 +11,7 @@
  - Handle top level `errors` parsing properly, should be able to handle multiple errors and parse the top level key
   `errros`
  - Remove all warnings in `rocket_jsonapi` crate, lots of unused stuff.
- - Disable unused warnings in `test_suite` crate.
+ - [x] Disable unused warnings in `test_suite` crate.
  - Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
  - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
  - Deriving `ResourceIdentifiable` should handle when `IdType=&str`, can copying be avoided?

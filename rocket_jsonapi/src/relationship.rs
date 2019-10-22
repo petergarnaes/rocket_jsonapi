@@ -1,6 +1,4 @@
-use crate::data::ResourceObjectType::Single;
-use crate::data::{ResourceIdentifiable, ResourceIdentifier, ResourceObjectType};
-use crate::links::Linkify;
+use crate::lib::*;
 
 //pub type Relationship = Box<dyn ResourceIdentifiable>;
 //pub type Relationships = Vec<Relationship>;
@@ -45,7 +43,7 @@ where
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
         RelationObject {
-            data: Single(ResourceIdentifier {
+            data: ResourceObjectType::Single(ResourceIdentifier {
                 id: rel.get_id().to_string(),
                 object_type: rel.get_type(),
             }),

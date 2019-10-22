@@ -82,7 +82,7 @@ fn impl_resource_identifiable(
     ast: syn::DeriveInput,
 ) -> Result<proc_macro2::TokenStream, ErrorMessage> {
     let name = &ast.ident;
-    let mut name_values = &ast
+    let name_values = &ast
         .attrs
         .iter()
         .filter_map(|attr| attr.parse_meta().ok())

@@ -52,12 +52,12 @@ fn test_gen_resource_identifiable_id_i32() {
     #[derive(ResourceIdentifiable)]
     struct Resource {
         id: i32,
-        message: String
+        message: String,
     }
     assert_resource_identifiable::<Resource>();
     let resource = Resource {
         id: 1,
-        message: "test".to_string()
+        message: "test".to_string(),
     };
     let test_id: i32 = 1;
     assert_eq!(test_id, *resource.get_id());
@@ -66,7 +66,7 @@ fn test_gen_resource_identifiable_id_i32() {
 #[derive(Debug)]
 struct CustomId {
     part1: i32,
-    part2: bool
+    part2: bool,
 }
 
 impl ToString for CustomId {
@@ -86,19 +86,19 @@ fn test_gen_resource_identifiable_id_custom() {
     #[derive(ResourceIdentifiable)]
     struct Resource {
         id: CustomId,
-        message: String
+        message: String,
     }
     assert_resource_identifiable::<Resource>();
     let resource = Resource {
         id: CustomId {
             part1: 5,
-            part2: false
+            part2: false,
         },
-        message: "test".to_string()
+        message: "test".to_string(),
     };
     let test_id = CustomId {
         part1: 5,
-        part2: false
+        part2: false,
     };
     assert_eq!(test_id, *resource.get_id());
 }

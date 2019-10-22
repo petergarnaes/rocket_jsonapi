@@ -1,7 +1,5 @@
-use crate::core::data_object::create_data_object;
-use crate::data::*;
+use crate::core::data_object::JsonApiPrimaryDataObject;
 use crate::lib::*;
-use crate::links::Linkify;
 
 fn ser<S, T, E, J>(
     serializer: S,

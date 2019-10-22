@@ -1,4 +1,4 @@
-use rocket_jsonapi::data::{PrimaryObjectType, ResourceIdentifiable, ResourceObjectType};
+use rocket_jsonapi::data::ResourceIdentifiable;
 use rocket_jsonapi::links::LinksObject::Object;
 use rocket_jsonapi::links::{LinkObject, Linkify, LinksObject};
 use rocket_jsonapi::relationship::{

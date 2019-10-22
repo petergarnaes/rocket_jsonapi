@@ -3,6 +3,8 @@
 mod core;
 
 mod lib {
+    pub use crate::data::*;
+    pub use crate::links::*;
     pub use serde::ser::{SerializeSeq, SerializeStruct};
     pub use serde::{Deserialize, Deserializer, Serialize, Serializer};
     // Possible to include core modules if we want them globally

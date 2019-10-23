@@ -169,11 +169,11 @@ mod tests {
     fn serialize_resource_identifiable_wrapper_string_id() {
         #[derive(Serialize)]
         struct T {
-            id: String,
+            id: Box<String>,
             message: String,
         }
         impl ResourceIdentifiable for T {
-            type IdType = String;
+            type IdType = Box<String>;
 
             fn get_type(&self) -> &'static str {
                 &"T"
@@ -184,7 +184,7 @@ mod tests {
             }
         }
         let test_instance = T {
-            id: "12".to_string(),
+            id: Box::new("12".to_string()),
             message: "Hello".to_string(),
         };
         let test_instance_value =

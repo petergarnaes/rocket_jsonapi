@@ -14,9 +14,10 @@
  - [x] Disable unused warnings in `test_suite` crate.
  - Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
  - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
- - Deriving `ResourceIdentifiable` should handle when `IdType=&str`, can copying be avoided?
+ - [x] Deriving `ResourceIdentifiable` should handle when `IdType=&str`, can copying be avoided?
  - [x] Write serialization tests of all the newtypes: `ResourceIdentifiableWrapper`, `JsonApiPrimaryDataObject` and
   `JsonApiPrimaryDataObjectArray`
+ - Hide `ResourceIdentifier` from user, move to core
  - Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
   type.
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included

@@ -1,5 +1,6 @@
 #![feature(specialization)]
 #![feature(associated_type_defaults)]
+#![feature(associated_type_bounds)]
 mod core;
 
 mod lib {

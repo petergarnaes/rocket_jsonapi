@@ -1,3 +1,4 @@
+use crate::core::serialize_no_conversion::CanSerializeNoConversion;
 use crate::lib::*;
 
 // Struct for data, will be parsed correctly
@@ -98,9 +99,9 @@ where
 }
 
 // Specialized case where we can simply read the Id, without having to convert it to a string first
-impl<'a, R> Serialize for ResourceIdentifiableWrapper<'a, R>
+impl<'a, Data> Serialize for ResourceIdentifiableWrapper<'a, Data>
 where
-    R: Serialize + ResourceIdentifiable<IdType = String>,
+    Data: Serialize + ResourceIdentifiable<IdType: CanSerializeNoConversion>,
 {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
@@ -108,7 +109,7 @@ where
     {
         let mut state = serializer.serialize_struct("ResourceIdentifier", 3)?;
         // Specialized part, here we simply read the Id value, no conversion needed
-        state.serialize_field("id", &self.0.get_id())?;
+        state.serialize_field("id", &self.0.get_id().as_str())?;
         state.serialize_field("type", self.0.get_type())?;
         state.serialize_field("attributes", &self.0)?;
         state.end()
@@ -158,6 +159,41 @@ mod tests {
             "type": "Test",
             "attributes": {
                 "id": 5,
+                "message": "Hello"
+            }
+        });
+        assert_eq!(test_instance_value, test_equals_value);
+    }
+
+    #[test]
+    fn serialize_resource_identifiable_wrapper_string_id() {
+        #[derive(Serialize)]
+        struct T {
+            id: String,
+            message: String,
+        }
+        impl ResourceIdentifiable for T {
+            type IdType = String;
+
+            fn get_type(&self) -> &'static str {
+                &"T"
+            }
+
+            fn get_id(&self) -> &Self::IdType {
+                &self.id
+            }
+        }
+        let test_instance = T {
+            id: "12".to_string(),
+            message: "Hello".to_string(),
+        };
+        let test_instance_value =
+            serde_json::to_value(ResourceIdentifiableWrapper(&test_instance)).unwrap();
+        let test_equals_value = json!({
+            "id": "12",
+            "type": "T",
+            "attributes": {
+                "id": "12",
                 "message": "Hello"
             }
         });

@@ -14,7 +14,10 @@
     - [x] Construct macro to easily create error object with variable amount of fields
     - [x] Macro positive testing
     - Macro negative testing
-    - Create static method constructors for top-level error representation (JsonApiResponseError)
+    - [x] Create static method constructors for top-level error representation (JsonApiResponseError)
+    - Create macro similar to `vec!` that takes different types of elements that implements `Into<JsonApiError>` and
+     returns `JsonApiResponseError`.
+    - `Serialize` testing
     - Integrate with JsonApiResponse
     - Maybe use Rocket.js error codes, if they have it, instead of error code being a u32?
     - Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
@@ -55,3 +58,4 @@
     - Link to docs
     - Make Hello World example
     - Expand on what the framework does, and does not do
+    - How to handle errors idiomatically

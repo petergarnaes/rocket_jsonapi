@@ -3,6 +3,7 @@ use std::error::Error;
 
 type ErrorCode = u32;
 
+#[derive(Debug)]
 pub struct JsonApiResponseError(ErrorCode, Vec<JsonApiError>);
 
 impl JsonApiResponseError {
@@ -48,12 +49,26 @@ impl JsonApiResponseError {
     }
 }
 
-#[derive(Debug, PartialEq, Default)]
+impl Serialize for JsonApiResponseError {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        self.1.serialize(serializer)
+    }
+}
+
+#[derive(Debug, PartialEq, Default, Serialize)]
 pub struct JsonApiError {
+    #[serde(skip_serializing_if = "Option::is_none")]
     id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     status: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     detail: Option<String>,
     // TODO source
     // TODO links
@@ -131,5 +146,37 @@ mod json_api_error_macro_tests {
             title: Some(String::from("Super failure")),
         };
         assert_eq!(generated_error, result_error);
+    }
+}
+
+#[cfg(test)]
+mod json_api_serialize_tests {
+    use crate::error::{JsonApiError, JsonApiResponseError};
+    use serde_json::json;
+
+    #[test]
+    fn test_serialize_as_vec_of_errors() {
+        let test_errors = vec![
+            JsonApiError {
+                id: Some(String::from("1")),
+                title: Some(String::from("I like turtles")),
+                ..Default::default()
+            },
+            JsonApiError {
+                id: Some(String::from("2")),
+                status: Some(String::from("400")),
+                ..Default::default()
+            },
+        ];
+        let test_instance = JsonApiResponseError(400, test_errors);
+        let test_instance_value = serde_json::to_value(test_instance).unwrap();
+        let test_equals_value = json!([{
+            "id": "1",
+            "title": "I like turtles",
+        },{
+            "id": "2",
+            "status": "400",
+        }]);
+        assert_eq!(test_instance_value, test_equals_value);
     }
 }

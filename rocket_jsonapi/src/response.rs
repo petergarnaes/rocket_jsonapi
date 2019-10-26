@@ -1,4 +1,5 @@
 use crate::core::data_object::JsonApiPrimaryDataObject;
+use crate::error::JsonApiResponseError;
 use crate::lib::*;
 
 /// Trait implemented on data objects so they can be parsed as resource objects. [See
@@ -21,13 +22,12 @@ pub trait ResourceIdentifiable {
 /// [See top-level document specification](https://jsonapi.org/format/#document-top-level).
 ///
 /// [See HTTP convention specification](https://jsonapi.org/format/#content-negotiation-servers).
-pub struct JsonApiResponse<Data, Error>(pub Result<Data, Error>);
+pub struct JsonApiResponse<Data>(pub Result<Data, JsonApiResponseError>);
 
-impl<Data, Error> Serialize for JsonApiResponse<Data, Error>
+impl<Data> Serialize for JsonApiResponse<Data>
 where
     // TODO implement Includify + AllRelationships
     Data: Serialize + ResourceIdentifiable + Linkify,
-    Error: Serialize,
 {
     default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -41,11 +41,10 @@ where
     }
 }
 
-impl<Data, Error> Serialize for JsonApiResponse<Vec<Data>, Error>
+impl<Data> Serialize for JsonApiResponse<Vec<Data>>
 where
     // TODO implement Includify + AllRelationships
     Data: Serialize + ResourceIdentifiable + Linkify,
-    Error: Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -88,17 +87,6 @@ mod tests {
 
     impl Linkify for Test {}
 
-    #[derive(Debug, Serialize)]
-    struct ErrorMessage(String);
-
-    impl std::fmt::Display for ErrorMessage {
-        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
-
-    impl Error for ErrorMessage {}
-
     #[test]
     fn serialize_json_api_response() {
         let test_instance = Test {
@@ -106,7 +94,7 @@ mod tests {
             message: "Hello".to_string(),
         };
         let test_instance_value =
-            serde_json::to_value(JsonApiResponse::<Test, ErrorMessage>(Ok(test_instance))).unwrap();
+            serde_json::to_value(JsonApiResponse::<Test>(Ok(test_instance))).unwrap();
         let test_equals_value = json!({
             "data": {
                 "id": "5",
@@ -130,12 +118,11 @@ mod tests {
             id: 6,
             message: "World".to_string(),
         };
-        let test_instance_value =
-            serde_json::to_value(JsonApiResponse::<Vec<Test>, ErrorMessage>(Ok(vec![
-                test_instance1,
-                test_instance2,
-            ])))
-            .unwrap();
+        let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(Ok(vec![
+            test_instance1,
+            test_instance2,
+        ])))
+        .unwrap();
         let test_equals_value = json!({
             "data": [{
                 "id": "5",

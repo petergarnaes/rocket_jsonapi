@@ -17,12 +17,13 @@
     - [x] Create static method constructors for top-level error representation (JsonApiResponseError)
     - Create macro similar to `vec!` that takes different types of elements that implements `Into<JsonApiError>` and
      returns `JsonApiResponseError`.
-    - `Serialize` testing
-    - Integrate with JsonApiResponse
+    - [x] `Serialize` testing
+    - [x] Integrate with JsonApiResponse
     - Maybe use Rocket.js error codes, if they have it, instead of error code being a u32?
     - Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
     and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
     to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
+    - Test top level serializing of errors
  - [x] Disable unused warnings in `test_suite` crate.
  - [x] Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
  - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.

@@ -1,6 +1,13 @@
 use crate::core::data_object::JsonApiPrimaryDataObject;
 use crate::lib::*;
 
+pub trait ResourceIdentifiable {
+    type IdType: ToString;
+
+    fn get_type(&self) -> &'static str;
+    fn get_id(&self) -> &Self::IdType;
+}
+
 fn ser<S, T, E, J>(
     serializer: S,
     result: &Result<T, E>,

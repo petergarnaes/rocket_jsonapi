@@ -7,7 +7,7 @@
 
 ## API stuff
 
- - Overhaul module structure, it is getting messy in `response.rs` and `data.rs`, new modules probably needed
+ - [x] Overhaul module structure, it is getting messy in `response.rs` and `data.rs`, new modules probably needed
  - Handle top level `errors` parsing properly, should be able to handle multiple errors and parse the top level key
   `errros`
  - Remove all warnings in `rocket_jsonapi` crate, lots of unused stuff.
@@ -17,7 +17,9 @@
  - [x] Deriving `ResourceIdentifiable` should handle when `IdType=&str`, can copying be avoided?
  - [x] Write serialization tests of all the newtypes: `ResourceIdentifiableWrapper`, `JsonApiPrimaryDataObject` and
   `JsonApiPrimaryDataObjectArray`
- - Hide `ResourceIdentifier` from user, move to core
+ - [x] Hide `ResourceIdentifier` from user, move to core
+ - Make `ResourceIdentifierWrapper` with serialization implementation, so when constructing resource identifiers, we
+  can simply read the objects we convert, instead of constructing new.
  - Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
   type.
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included

@@ -1,13 +1,5 @@
 use crate::lib::*;
 
-pub trait ResourceIdentifiable {
-    type IdType: ToString;
-
-    fn get_type(&self) -> &'static str;
-    fn get_id(&self) -> &Self::IdType;
-}
-
-// TODO maybe move to core, and hide for user
 #[derive(Serialize)]
 pub struct ResourceIdentifier {
     pub id: String,
@@ -43,11 +35,4 @@ impl ResourceIdentifiable for ResourceIdentifier {
     fn get_id(&self) -> &String {
         &self.id
     }
-}
-
-// TODO remove below
-pub enum ResourceObjectType<Data> {
-    Single(Data),
-    Multiple(Vec<Data>),
-    NoResource,
 }

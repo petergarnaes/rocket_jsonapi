@@ -134,7 +134,7 @@ fn impl_resource_identifiable(
     let id_type = &id_field.ty;
     // Defining inner macro for each expansion is ugly
     let gen = quote! {
-        impl rocket_jsonapi::data::ResourceIdentifiable for #name {
+        impl rocket_jsonapi::ResourceIdentifiable for #name {
             type IdType = #id_type;
 
             fn get_type(&self) -> &'static str {

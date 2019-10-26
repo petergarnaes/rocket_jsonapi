@@ -4,8 +4,8 @@
 mod core;
 
 mod lib {
-    pub use crate::data::*;
     pub use crate::links::*;
+    pub use crate::response::ResourceIdentifiable;
     pub use serde::ser::{SerializeSeq, SerializeStruct};
     pub use serde::{Deserialize, Deserializer, Serialize, Serializer};
     // Possible to include core modules if we want them globally
@@ -13,13 +13,12 @@ mod lib {
 
 pub mod info;
 pub mod response;
+pub use response::ResourceIdentifiable;
 
 // Exposing Linkify on root level path, because macros can only be on root level
 pub mod links;
 pub use links::Linkify;
 
-pub mod data;
-pub use data::ResourceIdentifiable;
 pub mod relationship;
 
 // Der skal filosoferes over hvordan vi med statisk opbygning kan lave en dynamisk data struktur.

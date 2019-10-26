@@ -1,10 +1,10 @@
 #![allow(dead_code)]
-use rocket_jsonapi::data::ResourceIdentifiable;
 use rocket_jsonapi::links::LinksObject::Object;
 use rocket_jsonapi::links::{LinkObject, Linkify, LinksObject};
 use rocket_jsonapi::relationship::{
     AllRelationships, HaveRelationship, RelationObject, RelationObjectify,
 };
+use rocket_jsonapi::ResourceIdentifiable;
 use serde::Serialize;
 
 #[derive(Serialize)]

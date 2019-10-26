@@ -10,6 +10,16 @@
  - [x] Overhaul module structure, it is getting messy in `response.rs` and `data.rs`, new modules probably needed
  - Handle top level `errors` parsing properly, should be able to handle multiple errors and parse the top level key
   `errros`
+    - [x] Make error representation
+    - [x] Construct macro to easily create error object with variable amount of fields
+    - [x] Macro positive testing
+    - Macro negative testing
+    - Create static method constructors for top-level error representation (JsonApiResponseError)
+    - Integrate with JsonApiResponse
+    - Maybe use Rocket.js error codes, if they have it, instead of error code being a u32?
+    - Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
+    and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
+    to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
  - [x] Disable unused warnings in `test_suite` crate.
  - [x] Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
  - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.

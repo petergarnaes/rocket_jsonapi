@@ -21,6 +21,8 @@ pub use links::Linkify;
 
 pub mod relationship;
 
+pub mod error;
+
 // Der skal filosoferes over hvordan vi med statisk opbygning kan lave en dynamisk data struktur.
 // Måske virkelig abuse dyn Trait
 // F.eks. hvordan printer vi et eller flere MAY felter på en struktur? Ideelt set skal man bare

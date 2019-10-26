@@ -51,8 +51,3 @@ pub enum ResourceObjectType<Data> {
     Multiple(Vec<Data>),
     NoResource,
 }
-
-pub enum PrimaryObjectType<Data: ResourceIdentifiable> {
-    Single(Data),
-    Multiple(Vec<Data>),
-}

@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use rocket_jsonapi::data::ResourceIdentifiable;
 use rocket_jsonapi::links::LinksObject::Object;
 use rocket_jsonapi::links::{LinkObject, Linkify, LinksObject};

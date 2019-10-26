@@ -4,11 +4,6 @@ use crate::lib::*;
 // Struct for data, will be parsed correctly
 pub struct JsonApiPrimaryDataObject<'a, Data>(pub &'a Data);
 
-// TODO could we make this the only implementation, and make default implementation for Linkify and
-// whatever I deside on for Relationships? Since these fields are optional it would make sense to
-// provide the user the option to return nothing, based on the data object (ie. NoLink enum and
-// corresponding in relationship). It would also make gradual and modular implementation possible,
-// ie. only implement Linkify, or only relationship, etc.
 impl<'a, Data> Serialize for JsonApiPrimaryDataObject<'a, Data>
 where
     Data: Serialize + ResourceIdentifiable + Linkify,
@@ -121,7 +116,6 @@ mod tests {
     use crate::core::data_object::{
         JsonApiPrimaryDataObject, JsonApiPrimaryDataObjectArray, ResourceIdentifiableWrapper,
     };
-    use crate::data::PrimaryObjectType;
     use crate::{Linkify, ResourceIdentifiable};
     use serde::Serialize;
     use serde_json::json;

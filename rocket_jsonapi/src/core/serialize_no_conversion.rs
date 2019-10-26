@@ -1,5 +1,4 @@
 pub trait CanSerializeNoConversion {
-    #[inline]
     fn as_str(&self) -> &str;
 }
 

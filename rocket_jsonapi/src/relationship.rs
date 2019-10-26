@@ -1,11 +1,11 @@
-use crate::core::resource_identifier::ResourceIdentifier;
+use crate::core::resource_identifier::ResourceIdentifierObject;
 use crate::lib::*;
 
 //pub type Relationship = Box<dyn ResourceIdentifiable>;
 //pub type Relationships = Vec<Relationship>;
 
 pub struct RelationObject {
-    data: Vec<ResourceIdentifier>,
+    data: Vec<ResourceIdentifierObject>,
     links: String,
 }
 
@@ -44,7 +44,7 @@ where
         let rel = self.get_relation();
         //RelationObject { data: to_resource_identifier(&rel), links: NoLink }
         RelationObject {
-            data: vec![ResourceIdentifier {
+            data: vec![ResourceIdentifierObject {
                 id: rel.get_id().to_string(),
                 object_type: rel.get_type(),
             }],

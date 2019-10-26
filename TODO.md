@@ -10,17 +10,16 @@
  - [x] Overhaul module structure, it is getting messy in `response.rs` and `data.rs`, new modules probably needed
  - Handle top level `errors` parsing properly, should be able to handle multiple errors and parse the top level key
   `errros`
- - Remove all warnings in `rocket_jsonapi` crate, lots of unused stuff.
  - [x] Disable unused warnings in `test_suite` crate.
- - Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
+ - [x] Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
  - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
  - [x] Deriving `ResourceIdentifiable` should handle when `IdType=&str`, can copying be avoided?
  - [x] Write serialization tests of all the newtypes: `ResourceIdentifiableWrapper`, `JsonApiPrimaryDataObject` and
   `JsonApiPrimaryDataObjectArray`
  - [x] Hide `ResourceIdentifier` from user, move to core
- - Make `ResourceIdentifierWrapper` with serialization implementation, so when constructing resource identifiers, we
+ - [x] Make `ResourceIdentifierWrapper` with serialization implementation, so when constructing resource identifiers, we
   can simply read the objects we convert, instead of constructing new.
- - Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
+ - [x] Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
   type.
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included
  - Make `Relationships` derivable, consider its current API
@@ -38,4 +37,11 @@
  
 ## Documentation stuff
 
- - All of it :(
+ - Making small dents in rustdoc.
+ - Make proper RustDoc that is presentable and easy to navigate
+    - Add favicon
+    - Add logo
+ - Expand README
+    - Link to docs
+    - Make Hello World example
+    - Expand on what the framework does, and does not do

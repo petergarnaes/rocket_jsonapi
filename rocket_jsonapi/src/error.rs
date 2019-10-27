@@ -58,7 +58,7 @@ impl Serialize for JsonApiResponseError {
         S: Serializer,
     {
         let mut state = serializer.serialize_struct("JsonApiResponseError", 1)?;
-        state.serialize_field("errors", &self.1);
+        state.serialize_field("errors", &self.1)?;
         state.end()
     }
 }
@@ -101,86 +101,3 @@ macro_rules! json_api_error {
 
 // TODO macro rule like vec! for constructing Vec<JsonApiError> by calling .into() on each element
 // in input
-
-#[cfg(test)]
-mod json_api_error_macro_tests {
-    use crate::error::JsonApiError;
-
-    #[test]
-    fn test_generate_single_field() {
-        let generated_error = json_api_error!(id = String::from("1"));
-        let result_error = JsonApiError {
-            id: Some(String::from("1")),
-            status: None,
-            code: None,
-            detail: None,
-            title: None,
-        };
-        assert_eq!(generated_error, result_error);
-    }
-
-    #[test]
-    fn test_generate_multiple_fields() {
-        let generated_error = json_api_error!(id = String::from("1"), status = String::from("409"));
-        let result_error = JsonApiError {
-            id: Some(String::from("1")),
-            status: Some(String::from("409")),
-            code: None,
-            detail: None,
-            title: None,
-        };
-        assert_eq!(generated_error, result_error);
-    }
-
-    #[test]
-    fn test_generate_all_fields() {
-        let generated_error = json_api_error!(
-            id = String::from("1"),
-            status = String::from("409"),
-            code = String::from("9"),
-            detail = String::from("Failed completely and utterly, please god help me!"),
-            title = String::from("Super failure")
-        );
-        let result_error = JsonApiError {
-            id: Some(String::from("1")),
-            status: Some(String::from("409")),
-            code: Some(String::from("9")),
-            detail: Some(String::from(
-                "Failed completely and utterly, please god help me!",
-            )),
-            title: Some(String::from("Super failure")),
-        };
-        assert_eq!(generated_error, result_error);
-    }
-}
-
-#[cfg(test)]
-mod json_api_serialize_tests {
-    use crate::error::{JsonApiError, JsonApiResponseError};
-    use serde_json::json;
-
-    #[test]
-    fn test_serialize_as_vec_of_errors() {
-        let test_errors = vec![
-            JsonApiError {
-                id: Some(String::from("1")),
-                title: Some(String::from("I like turtles")),
-                ..Default::default()
-            },
-            JsonApiError {
-                id: Some(String::from("2")),
-                status: Some(String::from("400")),
-                ..Default::default()
-            },
-        ];
-        let test_instance_value = serde_json::to_value(test_errors).unwrap();
-        let test_equals_value = json!([{
-            "id": "1",
-            "title": "I like turtles",
-        },{
-            "id": "2",
-            "status": "400",
-        }]);
-        assert_eq!(test_instance_value, test_equals_value);
-    }
-}

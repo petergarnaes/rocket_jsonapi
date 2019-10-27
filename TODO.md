@@ -24,6 +24,9 @@
     and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
     to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
     - [x] Test top level serializing of errors
+    - Implement `source` field for `JsonApiError`
+    - Implement `links` field for `JsonApiError`
+    - Implement `meta` field for `JsonApiError`
  - [x] Disable unused warnings in `test_suite` crate.
  - [x] Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
  - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
@@ -35,7 +38,7 @@
   can simply read the objects we convert, instead of constructing new.
  - [x] Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
   type.
- - Move many of the tests of public APIs to `test_suite` crate
+ - [x] Move many of the tests of public APIs to `test_suite` crate
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included
  - Make `Relationships` derivable, consider its current API
  - Make the `Included` API, probably use same approach as relationships API

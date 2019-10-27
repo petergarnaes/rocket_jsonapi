@@ -8,7 +8,7 @@
 ## API stuff
 
  - [x] Overhaul module structure, it is getting messy in `response.rs` and `data.rs`, new modules probably needed
- - Handle top level `errors` parsing properly, should be able to handle multiple errors and parse the top level key
+ - [x] Handle top level `errors` parsing properly, should be able to handle multiple errors and parse the top level key
   `errros`
     - [x] Make error representation
     - [x] Construct macro to easily create error object with variable amount of fields
@@ -23,7 +23,7 @@
     - [x] Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
     and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
     to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
-    - Test top level serializing of errors
+    - [x] Test top level serializing of errors
  - [x] Disable unused warnings in `test_suite` crate.
  - [x] Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
  - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
@@ -35,6 +35,7 @@
   can simply read the objects we convert, instead of constructing new.
  - [x] Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
   type.
+ - Move many of the tests of public APIs to `test_suite` crate
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included
  - Make `Relationships` derivable, consider its current API
  - Make the `Included` API, probably use same approach as relationships API

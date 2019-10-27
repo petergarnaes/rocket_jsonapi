@@ -4,18 +4,21 @@ use std::error::Error;
 type ErrorCode = u32;
 
 #[derive(Debug)]
-pub struct JsonApiResponseError(ErrorCode, Vec<JsonApiError>);
+pub struct JsonApiResponseError(pub ErrorCode, pub Vec<JsonApiError>);
 
 impl JsonApiResponseError {
-    fn new(error_code: ErrorCode, errors: Vec<JsonApiError>) -> Self {
+    pub fn new(error_code: ErrorCode, errors: Vec<JsonApiError>) -> Self {
         JsonApiResponseError(error_code, errors)
     }
 
-    fn from_item<I: Into<JsonApiError>>(error_code: ErrorCode, error: I) -> Self {
+    pub fn from_item<I: Into<JsonApiError>>(error_code: ErrorCode, error: I) -> Self {
         JsonApiResponseError(error_code, vec![error.into()])
     }
 
-    fn from_items<Items: Into<JsonApiError>>(error_code: ErrorCode, errors: Vec<Items>) -> Self {
+    pub fn from_items<Items: Into<JsonApiError>>(
+        error_code: ErrorCode,
+        errors: Vec<Items>,
+    ) -> Self {
         let mut json_api_errors = Vec::with_capacity(errors.len());
         for e in errors {
             json_api_errors.push(e.into())
@@ -25,7 +28,7 @@ impl JsonApiResponseError {
 
     /// Can be used for quickly mocking up your JSON:API implementation, although it is strongly
     /// recommended that `from_items` is used, to implement a more informative error response.
-    fn from_error<E: Error>(error_code: ErrorCode, error: E) -> Self {
+    pub fn from_error<E: Error>(error_code: ErrorCode, error: E) -> Self {
         JsonApiResponseError(
             error_code,
             vec![JsonApiError {
@@ -37,7 +40,7 @@ impl JsonApiResponseError {
 
     /// Can be used for quickly mocking up your JSON:API implementation, although it is strongly
     /// recommended that `from_items` is used, to implement a more informative error response.
-    fn from_errors<E: Error>(error_code: ErrorCode, errors: Vec<E>) -> Self {
+    pub fn from_errors<E: Error>(error_code: ErrorCode, errors: Vec<E>) -> Self {
         let mut json_api_errors = Vec::with_capacity(errors.len());
         for e in errors {
             json_api_errors.push(JsonApiError {
@@ -54,7 +57,9 @@ impl Serialize for JsonApiResponseError {
     where
         S: Serializer,
     {
-        self.1.serialize(serializer)
+        let mut state = serializer.serialize_struct("JsonApiResponseError", 1)?;
+        state.serialize_field("errors", &self.1);
+        state.end()
     }
 }
 
@@ -168,8 +173,7 @@ mod json_api_serialize_tests {
                 ..Default::default()
             },
         ];
-        let test_instance = JsonApiResponseError(400, test_errors);
-        let test_instance_value = serde_json::to_value(test_instance).unwrap();
+        let test_instance_value = serde_json::to_value(test_errors).unwrap();
         let test_equals_value = json!([{
             "id": "1",
             "title": "I like turtles",

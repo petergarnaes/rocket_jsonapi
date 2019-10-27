@@ -60,6 +60,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use crate::error::{JsonApiError, JsonApiResponseError};
+    use crate::json_api_error;
     use crate::response::JsonApiResponse;
     use crate::{Linkify, ResourceIdentifiable};
     use serde::Serialize;
@@ -138,6 +140,32 @@ mod tests {
                     "id": 6,
                     "message": "World"
                 }
+            }]
+        });
+        assert_eq!(test_instance_value, test_equals_value);
+    }
+
+    #[test]
+    fn serialize_json_api_response_error() {
+        let test_error1 = json_api_error!(
+            title = String::from("Super error"),
+            code = String::from("15")
+        );
+        let test_error2 = json_api_error!(
+            title = String::from("Medium error"),
+            code = String::from("17")
+        );
+        let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(Err(
+            JsonApiResponseError(400, vec![test_error1, test_error2]),
+        )))
+        .unwrap();
+        let test_equals_value = json!({
+            "errors": [{
+                "title": "Super error",
+                "code": "15"
+            },{
+                "title": "Medium error",
+                "code": "17"
             }]
         });
         assert_eq!(test_instance_value, test_equals_value);

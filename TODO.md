@@ -20,7 +20,7 @@
     - [x] `Serialize` testing
     - [x] Integrate with JsonApiResponse
     - Maybe use Rocket.js error codes, if they have it, instead of error code being a u32?
-    - Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
+    - [x] Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
     and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
     to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
     - Test top level serializing of errors

@@ -24,7 +24,7 @@ impl JsonApiResponseError {
     }
 
     /// Can be used for quickly mocking up your JSON:API implementation, although it is strongly
-    /// recommended that `from_items` is used.
+    /// recommended that `from_items` is used, to implement a more informative error response.
     fn from_error<E: Error>(error_code: ErrorCode, error: E) -> Self {
         JsonApiResponseError(
             error_code,
@@ -36,7 +36,7 @@ impl JsonApiResponseError {
     }
 
     /// Can be used for quickly mocking up your JSON:API implementation, although it is strongly
-    /// recommended that `from_items` is used.
+    /// recommended that `from_items` is used, to implement a more informative error response.
     fn from_errors<E: Error>(error_code: ErrorCode, errors: Vec<E>) -> Self {
         let mut json_api_errors = Vec::with_capacity(errors.len());
         for e in errors {
@@ -61,15 +61,15 @@ impl Serialize for JsonApiResponseError {
 #[derive(Debug, PartialEq, Default, Serialize)]
 pub struct JsonApiError {
     #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<String>,
+    pub id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    status: Option<String>,
+    pub status: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    code: Option<String>,
+    pub code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    title: Option<String>,
+    pub title: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    detail: Option<String>,
+    pub detail: Option<String>,
     // TODO source
     // TODO links
     // TODO meta
@@ -77,19 +77,19 @@ pub struct JsonApiError {
 
 #[macro_export]
 macro_rules! json_api_error {
-    { $( $field:ident = $val:expr ),* } => {
+    // Appends `key: Some(val),` to body
+    (@as_field ($ident:ident = $e:expr, $($tail:tt)*) -> ($($body:tt)*)) => {
+        json_api_error!(@as_field ($($tail)*) -> ($($body)* $ident: Some($e),))
+    };
+    //(@as_field (status = $e:expr, $($tail:tt)*) -> ($($body:tt)*)) => {
+    //    json_api_error!(@as_field ($($tail)*) -> ($($body)* status: Some($e),))
+    //};
+    // Exit rule
+    (@as_field ($(,)*) -> ($($body:tt)*)) => {JsonApiError{$($body)* ..Default::default()}};
+    // Entry rule
+    ($($body:tt)*) => {
         {
-            let mut error = JsonApiError {
-                id: None,
-                status: None,
-                code: None,
-                title: None,
-                detail: None,
-            };
-            $(
-                error.$field = Some($val);
-            )*
-            error
+            json_api_error!(@as_field ($($body)*,) -> ())
         }
     };
 }

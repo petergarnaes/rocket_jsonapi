@@ -1,0 +1,10 @@
+# Summary
+[Indtroduction](./introduction.md)
+- [Getting started](./getting-started.md)
+- [JSON:API requests](./request/index.md)
+    - [Update request](./request/update.md)
+- [JSON:API response](./response/index.md)
+    - [Resource objects](./response/resources.md)
+    - [Links](./response/links.md)
+    - [Relationships](./response/relationships.md)
+- [Errors](./errors/_index.md)

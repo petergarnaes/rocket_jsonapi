@@ -1,0 +1,6 @@
+[book]
+authors = ["Peter Alexander Garnæs"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Rocket.rs + JSON:API guide"

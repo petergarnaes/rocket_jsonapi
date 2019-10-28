@@ -5,7 +5,7 @@ error code and a `JsonApiError` as arguments. An example:
 ```rust
 use rocket_jsonapi::json_api_error;
 
-#[get("/error")]
+##[get("/error")]
 fn always_errors(request: JsonApiRequest) -> JsonApiResponse<()> {
     let error = json_api_error!(
         status = String::from("400"),

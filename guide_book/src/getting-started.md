@@ -26,24 +26,24 @@ the same.
 The following is a fully working example with Rocket.rs. It is a simple response to a JSON:API `GET` request for 
 `/test_data`.
 ```rust
-#![feature(proc_macro_hygiene, decl_macro)]
+##![feature(proc_macro_hygiene, decl_macro)]
 
-#[macro_use]
+##[macro_use]
 extern crate rocket;
-#[macro_use]
+##[macro_use]
 extern crate rocket_contrib;
-#[macro_use]
+##[macro_use]
 extern crate serde;
 
 use rocket_jsonapi::request::JsonApiRequest;
 use rocket_jsonapi::response::JsonApiResponse;
 
-#[derive(Serialize, ResourceIdentifiable, Linkify, Relationships)]
+##[derive(Serialize, ResourceIdentifiable, Linkify, Relationships)]
 struct TestData {
     id: String
 }
 
-#[get("/test_data")]
+##[get("/test_data")]
 fn test_data(json_api_repuest: JsonApiRequest) -> JsonApiResponse<TestData> {
     let test = TestData {id: String::from("1")};
     JsonApiResponse(Ok(test))

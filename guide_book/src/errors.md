@@ -8,7 +8,7 @@ use rocket_jsonapi::json_api_error;
 #[get("/error")]
 fn always_errors(request: JsonApiRequest) -> JsonApiResponse<()> {
     let error = json_api_error!(
-        status = String::from("400")
+        status = String::from("400"),
         detail = String::from("Always happens"),
     );
     JsonApiResponse(Err(JsonApiResponseError(400, vec![error])))

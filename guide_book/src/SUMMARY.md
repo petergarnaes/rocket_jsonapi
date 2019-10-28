@@ -7,4 +7,4 @@
     - [Resource objects](./response/resources.md)
     - [Links](./response/links.md)
     - [Relationships](./response/relationships.md)
-- [Errors](./errors/_index.md)
+- [Errors](./errors.md)

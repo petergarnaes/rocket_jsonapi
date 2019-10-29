@@ -7,14 +7,16 @@ In order to do this, this library provides the following:
  - A [Rocket.rs request guard](/request/index.md) for ensuring requests conforms to the specification.
  - A [Rocket.rs responder](/response/index.md) to convert the output to json that adhereres to the specification.
  - A set of traits to implement on the output data, so the responder can construct rich metadata in the response.
- - A ton of macros to make help you write less code.
+ - Some macros to help you write less code.
 
 ## Setup
 
-This crate is published on [crates.io](https://crates.io/) and can be added to your project by adding it as a dependency:
+This crate is published on [crates.io](https://crates.io/) and can be added to your project by adding it as a 
+dependency:
 ```toml
+# ./Cargo.tml
 [dependencies]
-rocket_jsonapi = { version = "1.0", features = ["derive"] }
+rocket_jsonapi = { version = "0.1", features = ["derive"] }
 ```
 Where `version = "0.1"` is the latest release. The `derive` feature makes a lot of the code derivable.
 

@@ -1,6 +1,11 @@
 use crate::core::data_object::JsonApiPrimaryDataObject;
 use crate::error::JsonApiResponseError;
 use crate::lib::*;
+use rocket::http::{ContentType, MediaType, Status};
+use rocket::response::content::Json;
+use rocket::response::{Content, Responder};
+use rocket::{Request, Response};
+use serde_json::to_string as serialize;
 
 /// Trait implemented on data objects so they can be parsed as resource objects. [See
 /// specification](https://jsonapi.org/format/#document-resource-objects). For this very reason it
@@ -55,5 +60,23 @@ where
             Err(err) => serializer.serialize_some(&err),
         }
         // TODO handle json_api field
+    }
+}
+
+impl<'r, Data> Responder<'r> for JsonApiResponse<Data>
+where
+    Data: Serialize,
+{
+    fn respond_to(self, request: &Request<'_>) -> Result<Response<'r>, Status> {
+        let json_api_mt = MediaType::new("application", "vnd.api+json");
+        match self.0 {
+            Ok(data) => Content(ContentType(json_api_mt), serialize(&data)).respond_to(request),
+            Err(error) => {
+                let mut response =
+                    Content(ContentType(json_api_mt), serialize(&error.1)).respond_to(request)?;
+                response.set_status(error.0);
+                Ok(response)
+            }
+        }
     }
 }

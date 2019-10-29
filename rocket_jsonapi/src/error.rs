@@ -1,7 +1,8 @@
 use crate::lib::*;
+use rocket::http::Status;
 use std::error::Error;
 
-type ErrorCode = u32;
+type ErrorCode = Status;
 
 #[derive(Debug)]
 pub struct JsonApiResponseError(pub ErrorCode, pub Vec<JsonApiError>);

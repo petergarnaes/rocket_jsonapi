@@ -4,6 +4,7 @@ Remember that `JsonApiResponse` takes as input a `Result<Data, JsonApiResponseEr
 error code and a `JsonApiError` as arguments. An example:
 ```rust
 use rocket_jsonapi::json_api_error;
+use rocket::http::Status;
 
 ##[get("/error")]
 fn always_errors(request: JsonApiRequest) -> JsonApiResponse<()> {
@@ -11,12 +12,12 @@ fn always_errors(request: JsonApiRequest) -> JsonApiResponse<()> {
         status = String::from("400"),
         detail = String::from("Always happens"),
     );
-    JsonApiResponse(Err(JsonApiResponseError(400, vec![error])))
+    JsonApiResponse(Err(JsonApiResponseError(Status::BadRequest, vec![error])))
 }
 ```
 
-The error code is the HTTP status of the response, so choose wisely. The `json_api_error` constructs an error object, 
-which will be further explained in the next section.
+The error code is a `Status` from `rocket`, so it is up to you to choose appropriately. The `json_api_error` constructs 
+an error object, which will be further explained in the next section.
 
 ## Error objects
 

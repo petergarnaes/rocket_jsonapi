@@ -10,5 +10,6 @@ publish = false
 [dev-dependencies]
 rocket_jsonapi = { path = "../rocket_jsonapi", features = ["derive"] }
 rocket_jsonapi_derive = { path = "../rocket_jsonapi_derive" }
+rocket = "0.4.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

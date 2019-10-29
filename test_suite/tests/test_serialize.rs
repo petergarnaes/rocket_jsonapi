@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 // Test that the various parts serialize properly
+use rocket::http::Status;
 use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
 use rocket_jsonapi::response::JsonApiResponse;
 use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable};
@@ -93,7 +94,7 @@ fn serialize_json_api_response_error() {
         code = String::from("17")
     );
     let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(Err(
-        JsonApiResponseError(400, vec![test_error1, test_error2]),
+        JsonApiResponseError(Status::BadRequest, vec![test_error1, test_error2]),
     )))
     .unwrap();
     let test_equals_value = json!({

@@ -19,7 +19,7 @@
      returns `JsonApiResponseError`.
     - [x] `Serialize` testing
     - [x] Integrate with JsonApiResponse
-    - Maybe use Rocket.js error codes, if they have it, instead of error code being a u32?
+    - [x] Maybe use Rocket.js error codes, if they have it, instead of error code being a u32?
     - [x] Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
     and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
     to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
@@ -48,8 +48,9 @@
    , or maybe entirely excluded.
  - Implement `JsonApi` as a [request guard](https://rocket.rs/v0.4/guide/requests/#custom-guards), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
- - Implement `JsonApi` as a [responser](https://rocket.rs/v0.4/guide/responses/#custom-responders), see rockets `Json
+ - [x] Implement `JsonApi` as a [responser](https://rocket.rs/v0.4/guide/responses/#custom-responders), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
+ - [x] Test `JsonApiResponse` as a `Responder`
  - Tests for `JsonApi`
  - Probably a ton more, that I forgot...
  

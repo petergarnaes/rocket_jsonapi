@@ -13,3 +13,8 @@ rocket_jsonapi_derive = { path = "../rocket_jsonapi_derive" }
 rocket = "0.4.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+
+[dev-dependencies.rocket_contrib]
+version = "0.4.2"
+default-features = false
+features = ["json"]

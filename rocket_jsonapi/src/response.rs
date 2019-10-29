@@ -65,15 +65,17 @@ where
 
 impl<'r, Data> Responder<'r> for JsonApiResponse<Data>
 where
-    Data: Serialize,
+    Data: Serialize + ResourceIdentifiable + Linkify,
 {
     fn respond_to(self, request: &Request<'_>) -> Result<Response<'r>, Status> {
         let json_api_mt = MediaType::new("application", "vnd.api+json");
+        // TODO improve or think about what to do in this case...
+        let response = serialize(&self).map_err(|e| Status::InternalServerError)?;
         match self.0 {
-            Ok(data) => Content(ContentType(json_api_mt), serialize(&data)).respond_to(request),
+            Ok(data) => Content(ContentType(json_api_mt), response).respond_to(request),
             Err(error) => {
                 let mut response =
-                    Content(ContentType(json_api_mt), serialize(&error.1)).respond_to(request)?;
+                    Content(ContentType(json_api_mt), response).respond_to(request)?;
                 response.set_status(error.0);
                 Ok(response)
             }

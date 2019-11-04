@@ -48,8 +48,10 @@
   for some nifty implementations with heavy re-use of code through inheritance, only overriding the parts the user
    wishes. For example, a `Person` could also be used as a relationship, like `Author`, but where `links` are changed
    , or maybe entirely excluded.
- - Implement `JsonApi` as a [request guard](https://rocket.rs/v0.4/guide/requests/#custom-guards), see rockets `Json
+ - [x] Implement `JsonApi` as a [request guard](https://rocket.rs/v0.4/guide/requests/#custom-guards), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
+    - Look into if reader interface of Data input is an attack vector for DoS
+    - Are we using the right errors in our `FromRequest` and `FromData` implementation in our `FromRequest` and `FromData` implementationss?
  - [x] Implement `JsonApi` as a [responser](https://rocket.rs/v0.4/guide/responses/#custom-responders), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
  - [x] Test `JsonApiResponse` as a `Responder`
@@ -58,12 +60,9 @@
  
 ## Documentation stuff
 
- - Making small dents in rustdoc.
  - Make proper RustDoc that is presentable and easy to navigate
     - Add favicon
     - Add logo
  - Expand README
     - Link to docs
-    - Make Hello World example
     - Expand on what the framework does, and does not do
-    - How to handle errors idiomatically

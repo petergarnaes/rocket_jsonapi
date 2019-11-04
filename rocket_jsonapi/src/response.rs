@@ -72,9 +72,101 @@ pub trait ResourceIdentifiable {
 ///
 /// ## Usage
 ///
-/// ## Example
+/// To return data of type `Data`, your return type should be: `JsonApiResponse<Data>`. `Data` must
+/// implement `serde::Serialize`. `JsonApiResponse` is a wrapper of
+/// `Result<Data,JsonApiResponseError>`, so constructing `JsonApiResponse` is as simple as
+/// `JsonApiResponse(Ok(data))`.
+///
+/// # Example
+///
+/// Here is a simple example:
+///
+/// ```rust
+/// # #![feature(decl_macro)]
+/// # #[macro_use]
+/// # use rocket::*;
+/// # use crate::rocket_jsonapi::response::JsonApiResponse;
+/// # use crate::rocket_jsonapi::{Linkify, ResourceIdentifiable};
+/// # use serde::Serialize;
+/// #
+/// #[derive(Serialize, ResourceIdentifiable, Linkify)]
+/// struct Test {
+///    id: i32,
+///    message: String,
+/// }
+///
+/// #[get("/simple")]
+/// fn simple() -> JsonApiResponse<Test> {
+///     JsonApiResponse(Ok(Test {
+///         id: 1,
+///         message: String::from("Hello!"),
+///     }))
+/// }
+/// ```
+///
+/// Which outputs:
+///
+/// ```ignore
+/// Status code: 200, Content-Type: application/vnd.api+json
+/// ---
+/// {
+///     "data": {
+///         "id": "1",
+///         "type": "Test",
+///         "attributes": {
+///             "id": 5,
+///             "message": "Hello!"
+///         }
+///     }
+/// }
+/// ```
 ///
 /// ## Errors
+///
+/// When returning errors, you must construct an instance of `JsonApiResponseError`, and construct
+/// it like this: `JsonApiResponse(Err(error))`. It is your responsibility to choose the appropriate
+/// http status code for the error. See `JsonApiResponseError` for more.
+///
+/// Example:
+/// ```rust
+/// # #![feature(decl_macro)]
+/// # #[macro_use]
+/// # use rocket::{get};
+/// # use rocket::http::Status;
+/// # use crate::rocket_jsonapi::response::JsonApiResponse;
+/// # use crate::rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
+/// # use crate::rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable};
+/// # use serde::Serialize;
+/// #[derive(Serialize, ResourceIdentifiable, Linkify)]
+/// struct Test {
+///    id: i32,
+///    message: String,
+/// }
+///
+/// #[get("/simple_error")]
+/// fn simple_error() -> JsonApiResponse<Test> {
+///     JsonApiResponse(Err(JsonApiResponseError(
+///         Status::BadRequest,
+///         vec![json_api_error!(
+///             id = String::from("5"),
+///             status = String::from("406")
+///         )],
+///     )))
+/// }
+/// ```
+///
+/// Which outputs:
+///
+/// ```ignore
+/// Status code: 400, Content-Type: application/vnd.api+json
+/// ---
+/// {
+///     "errors": [{
+///         "id": "5",
+///         "status": "406"
+///     }]
+/// }
+/// ```
 pub struct JsonApiResponse<Data>(pub Result<Data, JsonApiResponseError>);
 
 impl<Data> Serialize for JsonApiResponse<Data>

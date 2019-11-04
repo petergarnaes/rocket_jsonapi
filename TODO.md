@@ -1,4 +1,4 @@
-# TODO
+/home/pag/Projects/hopper-backend/shop-api# TODO
 
 ## Crate stuff
 
@@ -24,6 +24,8 @@
     and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
     to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
     - [x] Test top level serializing of errors
+    - Change `JsonApiResponse` to take Vec of errors that implement `AsJsonApiError`? `JsonApiError` can have default 
+    implementation. But what about ErrorCode?
     - Implement `source` field for `JsonApiError`
     - Implement `links` field for `JsonApiError`
     - Implement `meta` field for `JsonApiError`

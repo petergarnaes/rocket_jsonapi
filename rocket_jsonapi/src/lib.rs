@@ -1,6 +1,20 @@
 #![feature(specialization)]
 #![feature(associated_type_defaults)]
 #![feature(associated_type_bounds)]
+
+//! # JSON:API + Rocket.rs
+//!
+//! This library helps provide JSON:API compliant API's through Rocket.rs in a simple way. The
+//! library provides:
+//!
+//!  - A [RequestGuard](https://rocket.rs/v0.4/guide/requests/#request-guards) and
+//!     [DataGuard](https://api.rocket.rs/v0.4/rocket/data/trait.FromData.html#data-guards) for
+//!     verifying and deserializing incoming requests
+//!  - A [Responder](https://rocket.rs/v0.4/guide/responses/#responder) for serializing correctly,
+//!     with all metadata added
+//!  - A set of traits implemented on data, to provide metadata like `links` or `relationships`
+//!     like the specification allows.
+//!  - A set of macros and derive macros to reduce boilerplate
 mod core;
 
 mod lib {
@@ -14,6 +28,7 @@ mod lib {
 pub mod info;
 pub mod response;
 pub use response::ResourceIdentifiable;
+pub mod request;
 
 // Exposing Linkify on root level path, because macros can only be on root level
 pub mod links;
@@ -22,17 +37,6 @@ pub use links::Linkify;
 pub mod relationship;
 
 pub mod error;
-
-// Der skal filosoferes over hvordan vi med statisk opbygning kan lave en dynamisk data struktur.
-// Måske virkelig abuse dyn Trait
-// F.eks. hvordan printer vi et eller flere MAY felter på en struktur? Ideelt set skal man bare
-// implementere nogle simple traits, men specialization er ikke god nok til at man kan implementere
-// alle permutationer af traits, kun kombinationer som set uden kontekst aldrig kan clashe kan
-// fungere sammen.
-// Hvis brugeren selv skal opbygge, kunne det måske gøres med builder pattern? https://doc.rust-lang.org/1.8.0/std/fs/struct.DirBuilder.html
-// https://www.reddit.com/r/rust/comments/4jgvho/idiomatic_way_to_implement_optional_arguments/
-
-// Måske kan lidt trait implementationer sammen med noget macro magi lave klisteret?
 
 #[cfg(feature = "rocket_jsonapi_derive")]
 #[allow(unused_imports)]

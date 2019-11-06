@@ -1,3 +1,4 @@
+//! # Returning valid JSON:API responses
 use crate::core::data_object::JsonApiPrimaryDataObject;
 use crate::error::JsonApiResponseError;
 use crate::lib::*;
@@ -6,9 +7,10 @@ use rocket::response::{Content, Responder};
 use rocket::{Request, Response};
 use serde_json::to_string as serialize;
 
-/// Trait implemented on data objects so they can be parsed as resource objects. [See
-/// specification](https://jsonapi.org/format/#document-resource-objects). For this very reason it
-/// is required that this trait is implemented on data returned from a `JsonApiResponse`.
+/// Trait implemented on data objects so they can be parsed as resource objects.
+///
+/// [See specification](https://jsonapi.org/format/#document-resource-objects). For this very reason
+/// it is required that this trait is implemented on data returned from a `JsonApiResponse`.
 ///
 /// ### Using `#[derive(ResourceIdentifiable)]`
 ///
@@ -145,7 +147,7 @@ pub trait ResourceIdentifiable {
 ///
 /// #[get("/simple_error")]
 /// fn simple_error() -> JsonApiResponse<Test> {
-///     JsonApiResponse(Err(JsonApiResponseError(
+///     JsonApiResponse(Err(JsonApiResponseError::new(
 ///         Status::BadRequest,
 ///         vec![json_api_error!(
 ///             id = String::from("5"),
@@ -216,7 +218,7 @@ where
             Err(error) => {
                 let mut response =
                     Content(ContentType(json_api_mt), response).respond_to(request)?;
-                response.set_status(error.0);
+                response.set_status(error.get_error_code());
                 Ok(response)
             }
         }

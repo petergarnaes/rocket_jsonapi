@@ -94,7 +94,7 @@ fn serialize_json_api_response_error() {
         code = String::from("17")
     );
     let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(Err(
-        JsonApiResponseError(Status::BadRequest, vec![test_error1, test_error2]),
+        JsonApiResponseError::new(Status::BadRequest, vec![test_error1, test_error2]),
     )))
     .unwrap();
     let test_equals_value = json!({

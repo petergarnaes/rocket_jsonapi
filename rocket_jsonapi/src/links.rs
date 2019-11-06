@@ -1,3 +1,4 @@
+//! # Responding with link metadata
 use crate::lib::*;
 use erased_serde::Serialize as RefSerialize;
 

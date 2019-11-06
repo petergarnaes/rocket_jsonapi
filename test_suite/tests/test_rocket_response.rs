@@ -28,7 +28,7 @@ fn simple() -> JsonApiResponse<Test> {
 
 #[get("/simple_error")]
 fn simple_error() -> JsonApiResponse<Test> {
-    JsonApiResponse(Err(JsonApiResponseError(
+    JsonApiResponse(Err(JsonApiResponseError::new(
         Status::NotAcceptable,
         vec![json_api_error!(
             id = String::from("5"),

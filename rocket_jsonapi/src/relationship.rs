@@ -1,3 +1,4 @@
+//! # Responding with relationship metadata
 use crate::core::resource_identifier::ResourceIdentifierObject;
 use crate::lib::*;
 

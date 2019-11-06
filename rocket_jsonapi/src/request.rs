@@ -1,3 +1,4 @@
+//! # Validating JSON:API requests
 use crate::lib::*;
 use rocket::data::{self, FromDataSimple};
 use rocket::http::Status;

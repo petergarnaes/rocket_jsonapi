@@ -78,6 +78,36 @@ impl fmt::Display for ResourceIdentifiableDeriveError {
 impl Error for ResourceIdentifiableDeriveError {}
 */
 
+fn impl_resource_type(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, ErrorMessage> {
+    let name = &ast.ident;
+    let name_values = &ast
+        .attrs
+        .iter()
+        .filter_map(|attr| attr.parse_meta().ok())
+        .filter_map(|m| match m {
+            NameValue(meta) => Some(meta),
+            _ => None,
+        })
+        .collect::<Vec<MetaNameValue>>();
+    // TODO refactor, maybe share with `resource_ident_id`
+    let resource_ident_type = name_values
+        .iter()
+        .find(|m| m.path.is_ident("resource_ident_type"))
+        .map_or(ident_type_from(&name), |m| match &m.lit {
+            Str(literal) => Ident::new(&literal.value(), Span::call_site()),
+            _ => ident_type_from(&name),
+        });
+    // Defining inner macro for each expansion is ugly
+    let gen = quote! {
+        impl rocket_jsonapi::ResourceType for #name {
+            fn get_type(&self) -> &'static str {
+                &stringify!(#resource_ident_type)
+            }
+        }
+    };
+    Ok(gen)
+}
+
 fn impl_resource_identifiable(
     ast: syn::DeriveInput,
 ) -> Result<proc_macro2::TokenStream, ErrorMessage> {
@@ -92,13 +122,6 @@ fn impl_resource_identifiable(
         })
         .collect::<Vec<MetaNameValue>>();
     // TODO refactor, maybe share with `resource_ident_type`
-    let resource_ident_type = name_values
-        .iter()
-        .find(|m| m.path.is_ident("resource_ident_type"))
-        .map_or(ident_type_from(&name), |m| match &m.lit {
-            Str(literal) => Ident::new(&literal.value(), Span::call_site()),
-            _ => ident_type_from(&name),
-        });
     let resource_ident_id = name_values
         .iter()
         .find(|m| m.path.is_ident("resource_ident_id"))
@@ -128,7 +151,7 @@ fn impl_resource_identifiable(
     .ok_or_else(|| {
         ErrorMessage(format!(
             "{} does not have an id field named {}",
-            resource_ident_type, resource_ident_id
+            name, resource_ident_id
         ))
     })?;
     let id_type = &id_field.ty;
@@ -137,9 +160,6 @@ fn impl_resource_identifiable(
         impl rocket_jsonapi::ResourceIdentifiable for #name {
             type IdType = #id_type;
 
-            fn get_type(&self) -> &'static str {
-                &stringify!(#resource_ident_type)
-            }
             fn get_id(&self) -> &Self::IdType {
                 &self.#resource_ident_id
             }
@@ -148,10 +168,12 @@ fn impl_resource_identifiable(
     Ok(gen)
 }
 
-#[proc_macro_derive(
-    ResourceIdentifiable,
-    attributes(resource_ident_id, resource_ident_type)
-)]
+#[proc_macro_derive(ResourceType, attributes(resource_ident_type))]
+pub fn resource_type_derive(input: TokenStream) -> TokenStream {
+    expand_proc_macro(input, impl_resource_type)
+}
+
+#[proc_macro_derive(ResourceIdentifiable, attributes(resource_ident_id))]
 pub fn resource_identifiable_derive(input: TokenStream) -> TokenStream {
     expand_proc_macro(input, impl_resource_identifiable)
 }

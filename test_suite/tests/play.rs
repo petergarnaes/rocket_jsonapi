@@ -4,6 +4,7 @@ use rocket_jsonapi::links::{LinkObject, Linkify, LinksObject};
 use rocket_jsonapi::relationship::{
     AllRelationships, HaveRelationship, RelationObject, RelationObjectify,
 };
+use rocket_jsonapi::response::ResourceType;
 use rocket_jsonapi::ResourceIdentifiable;
 use serde::Serialize;
 
@@ -23,12 +24,14 @@ struct Article {
     article: String,
 }
 
-impl ResourceIdentifiable for Article {
-    type IdType = i32;
-
+impl ResourceType for Article {
     fn get_type(&self) -> &'static str {
         &"article"
     }
+}
+
+impl ResourceIdentifiable for Article {
+    type IdType = i32;
 
     fn get_id(&self) -> &i32 {
         &self.id
@@ -78,12 +81,14 @@ struct Person {
     name: String,
 }
 
-impl ResourceIdentifiable for Person {
-    type IdType = i32;
-
+impl ResourceType for Person {
     fn get_type(&self) -> &'static str {
         &"person"
     }
+}
+
+impl ResourceIdentifiable for Person {
+    type IdType = i32;
 
     fn get_id(&self) -> &Self::IdType {
         &self.id
@@ -99,12 +104,14 @@ impl Linkify for Person {
 //type Author = Person;
 struct Author(Person);
 
-impl ResourceIdentifiable for Author {
-    type IdType = i32;
-
+impl ResourceType for Author {
     fn get_type(&self) -> &'static str {
         self.0.get_type()
     }
+}
+
+impl ResourceIdentifiable for Author {
+    type IdType = i32;
 
     fn get_id(&self) -> &Self::IdType {
         self.0.get_id()
@@ -119,12 +126,14 @@ impl Linkify for Author {
 
 struct ProofReader(Person);
 
-impl ResourceIdentifiable for ProofReader {
-    type IdType = i32;
-
+impl ResourceType for ProofReader {
     fn get_type(&self) -> &'static str {
         self.0.get_type()
     }
+}
+
+impl ResourceIdentifiable for ProofReader {
+    type IdType = i32;
 
     fn get_id(&self) -> &Self::IdType {
         self.0.get_id()

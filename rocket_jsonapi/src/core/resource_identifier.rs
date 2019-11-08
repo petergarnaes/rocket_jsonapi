@@ -1,4 +1,5 @@
 use crate::lib::*;
+use crate::response::ResourceType;
 
 /// Object to represent a "resource identifier object", which is an object that identifies an
 /// individual resource. [See specification](https://jsonapi
@@ -33,12 +34,14 @@ impl<T: ResourceIdentifiable> From<&T> for ResourceIdentifierObject {
     }
 }
 
-impl ResourceIdentifiable for ResourceIdentifierObject {
-    type IdType = String;
-
+impl ResourceType for ResourceIdentifierObject {
     fn get_type(&self) -> &'static str {
         self.object_type
     }
+}
+
+impl ResourceIdentifiable for ResourceIdentifierObject {
+    type IdType = String;
 
     fn get_id(&self) -> &String {
         &self.id

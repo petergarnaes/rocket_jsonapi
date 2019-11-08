@@ -41,6 +41,7 @@
  - [x] Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
   type.
  - [x] Move many of the tests of public APIs to `test_suite` crate
+ - Test derive of `ResourceType`
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included
  - Make `Relationships` derivable, consider its current API
  - Make the `Included` API, probably use same approach as relationships API
@@ -52,6 +53,19 @@
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
     - Look into if reader interface of Data input is an attack vector for DoS
     - Are we using the right errors in our `FromRequest` and `FromData` implementation in our `FromRequest` and `FromData` implementationss?
+ - [x] Implement `JsonApi` as a [data guard](https://api.rocket.rs/v0.4/rocket/data/trait.FromData.html)
+    - Testing POST data requests w. deserialization
+    - Negative testing POST data requests w. deserialization
+ - Proper deserialization of input data types
+    - [x] deserialising input types for insert requests
+    - Implement type check
+    - Negative testing of deserializing input types for insert
+    - Support deserializing relationships for input types for insert
+    - deserialising input types for update (with id) requests
+    - Negative testing of deserializing input types for update (with id)
+    - Support deserializing relationships for input types for update (with id)
+    - Deserialize input type with variable fields for PATCH updates
+    - Support client generated ID for insert statement
  - [x] Implement `JsonApi` as a [responser](https://rocket.rs/v0.4/guide/responses/#custom-responders), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
  - [x] Test `JsonApiResponse` as a `Responder`
@@ -61,6 +75,8 @@
 ## Documentation stuff
 
  - Make proper RustDoc that is presentable and easy to navigate
+    - Change doc and use [] to link internally in docs
+    - Update docs to reflect `ResourceType`
     - Add favicon
     - Add logo
  - Expand README

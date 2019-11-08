@@ -2,7 +2,7 @@
 // These test simply verifies that rocket_jsonapi_derive is able to produce code that compiles.
 
 use rocket_jsonapi::Linkify;
-use rocket_jsonapi::ResourceIdentifiable;
+use rocket_jsonapi::{ResourceIdentifiable, ResourceType};
 
 #[test]
 fn test_gen_linkify_simple() {
@@ -16,7 +16,7 @@ fn test_gen_linkify_simple() {
 
 #[test]
 fn test_gen_resource_identifiable_simple() {
-    #[derive(ResourceIdentifiable)]
+    #[derive(ResourceType, ResourceIdentifiable)]
     struct SimpleResource {
         id: String,
         bob: Box<String>,
@@ -32,7 +32,7 @@ fn test_gen_resource_identifiable_simple() {
 
 #[test]
 fn test_gen_resource_identifiable_custom_type() {
-    #[derive(ResourceIdentifiable)]
+    #[derive(ResourceType, ResourceIdentifiable)]
     #[resource_ident_type = "test"]
     struct SimpleResourceCustomType {
         id: String,
@@ -49,7 +49,7 @@ fn test_gen_resource_identifiable_custom_type() {
 
 #[test]
 fn test_gen_resource_identifiable_id_i32() {
-    #[derive(ResourceIdentifiable)]
+    #[derive(ResourceType, ResourceIdentifiable)]
     struct Resource {
         id: i32,
         message: String,
@@ -83,7 +83,7 @@ impl PartialEq for CustomId {
 
 #[test]
 fn test_gen_resource_identifiable_id_custom() {
-    #[derive(ResourceIdentifiable)]
+    #[derive(ResourceType, ResourceIdentifiable)]
     struct Resource {
         id: CustomId,
         message: String,
@@ -104,4 +104,5 @@ fn test_gen_resource_identifiable_id_custom() {
 }
 
 fn assert_linkify<T: Linkify>() {}
+fn assert_resource_type<T: ResourceType>() {}
 fn assert_resource_identifiable<T: ResourceIdentifiable>() {}

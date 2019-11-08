@@ -2,7 +2,7 @@
 // Test that the various parts serialize properly
 use rocket::http::Status;
 use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
-use rocket_jsonapi::response::JsonApiResponse;
+use rocket_jsonapi::response::{JsonApiResponse, ResourceType};
 use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable};
 use serde::Serialize;
 use serde_json::json;
@@ -13,12 +13,14 @@ struct Test {
     message: String,
 }
 
-impl ResourceIdentifiable for Test {
-    type IdType = i32;
-
+impl ResourceType for Test {
     fn get_type(&self) -> &'static str {
         &"Test"
     }
+}
+
+impl ResourceIdentifiable for Test {
+    type IdType = i32;
 
     fn get_id(&self) -> &Self::IdType {
         &self.id

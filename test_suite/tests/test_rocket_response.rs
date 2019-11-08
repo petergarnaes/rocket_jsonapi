@@ -8,11 +8,11 @@ use rocket::http::Status;
 use rocket::local::Client;
 use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
 use rocket_jsonapi::response::JsonApiResponse;
-use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable};
+use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable, ResourceType};
 use serde::Serialize;
 use serde_json::{from_str, json, Value};
 
-#[derive(Serialize, ResourceIdentifiable, Linkify)]
+#[derive(Serialize, ResourceType, ResourceIdentifiable, Linkify)]
 struct Test {
     id: i32,
     message: String,

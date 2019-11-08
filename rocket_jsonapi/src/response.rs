@@ -1,64 +1,76 @@
 //! # Returning valid JSON:API responses
+//!
+//! This module exports types for responding with JSON:API compliant responses.
+//!
+//! This excludes the types for metadata like `links` and `relationship`.
 use crate::core::data_object::JsonApiPrimaryDataObject;
 use crate::error::JsonApiResponseError;
 use crate::lib::*;
-use rocket::http::{ContentType, MediaType, Status};
-use rocket::response::{Content, Responder};
+use rocket::http::{ContentType, Status};
+use rocket::response::Responder;
 use rocket::{Request, Response};
 use serde_json::to_string as serialize;
+use std::io::Cursor;
 
-/// Trait implemented on data objects so they can be parsed as resource objects.
-///
-/// [See specification](https://jsonapi.org/format/#document-resource-objects). For this very reason
-/// it is required that this trait is implemented on data returned from a `JsonApiResponse`.
-///
-/// ### Using `#[derive(ResourceIdentifiable)]`
-///
-/// Import the derive macro:
-/// ```rust
-/// use rocket_jsonapi::ResourceIdentifiable;
-/// ```
-/// When derived, it defaults to using the field named `id` on the implementing `struct`.
-/// The `type` defaults to the name of the `struct`. Example:
-/// ```rust
-/// # use rocket_jsonapi::ResourceIdentifiable;
-/// #
-/// #[derive(ResourceIdentifiable)]
-/// struct Article { // "Article" is returned by get_type()
-///     id: i32, // id field is returned by derived get_id()
-///     author_name: String,
-///     text: String
-/// }
-/// ```
-///
-/// #### Customizing `#[derive(ResourceIdentifiable)]` behaviour
-///
-/// Both `id` and `type` can be changed when deriving.
-///
-/// `#[resource_ident_id = "id_field"]` changes the field that functions as the `id`.
-///
-/// `#[resource_ident_type = "CustomType"]` changes the `type`.
-///
-/// Example:
-/// ```rust
-/// # use rocket_jsonapi::ResourceIdentifiable;
-/// #
-/// #[derive(ResourceIdentifiable)]
-/// #[resource_ident_id = "author_name"]
-/// #[resource_ident_type = "Chapter"]
-/// struct Article { // "Chapter" is returned by get_type()
-///     id: i32,
-///     author_name: String, // author_name field is returned by derived get_id()
-///     text: String
-/// }
-/// ```
-pub trait ResourceIdentifiable {
+pub trait ResourceType {
+    /// Returns the resource type
+    fn get_type(&self) -> &'static str;
+}
+
+pub trait ResourceIdentifiable: ResourceType {
+    /// Trait implemented on data objects so they can be parsed as resource objects.
+    ///
+    /// [See specification](https://jsonapi.org/format/#document-resource-objects). For this very reason
+    /// it is required that this trait is implemented on data returned from a `JsonApiResponse`.
+    ///
+    /// The trait requires the [ResourceType] to be implemented, because a resource object requires
+    /// a type.
+    ///
+    /// ### Using `#[derive(ResourceIdentifiable)]`
+    ///
+    /// Import the derive macro:
+    /// ```rust
+    /// use rocket_jsonapi::ResourceIdentifiable;
+    /// ```
+    /// When derived, it defaults to using the field named `id` on the implementing `struct`.
+    /// The `type` defaults to the name of the `struct`. Example:
+    /// ```rust
+    /// # use rocket_jsonapi::{ResourceType, ResourceIdentifiable};
+    /// #
+    /// #[derive(ResourceType, ResourceIdentifiable)]
+    /// struct Article { // "Article" is returned by get_type()
+    ///     id: i32, // id field is returned by derived get_id()
+    ///     author_name: String,
+    ///     text: String
+    /// }
+    /// ```
+    ///
+    /// #### Customizing `#[derive(ResourceIdentifiable)]` behaviour
+    ///
+    /// Both `id` and `type` can be changed when deriving.
+    ///
+    /// `#[resource_ident_id = "id_field"]` changes the field that functions as the `id`.
+    ///
+    /// `#[resource_ident_type = "CustomType"]` changes the `type`.
+    ///
+    /// Example:
+    /// ```rust
+    /// # use rocket_jsonapi::{ResourceType, ResourceIdentifiable};
+    /// #
+    /// #[derive(ResourceType, ResourceIdentifiable)]
+    /// #[resource_ident_id = "author_name"]
+    /// #[resource_ident_type = "Chapter"]
+    /// struct Article { // "Chapter" is returned by get_type()
+    ///     id: i32,
+    ///     author_name: String, // author_name field is returned by derived get_id()
+    ///     text: String
+    /// }
+    /// ```
+
     /// The type of the id returned by `get_id(&self)`, must implement ToString, because the
     /// specification states resource ids must be strings
     type IdType: ToString;
 
-    /// Returns the resource type
-    fn get_type(&self) -> &'static str;
     /// Returns the resource id
     fn get_id(&self) -> &Self::IdType;
 }
@@ -75,9 +87,11 @@ pub trait ResourceIdentifiable {
 /// ## Usage
 ///
 /// To return data of type `Data`, your return type should be: `JsonApiResponse<Data>`. `Data` must
-/// implement `serde::Serialize`. `JsonApiResponse` is a wrapper of
-/// `Result<Data,JsonApiResponseError>`, so constructing `JsonApiResponse` is as simple as
-/// `JsonApiResponse(Ok(data))`.
+/// implement `serde::Serialize`, `rocket_jsonapi::ResourceIdentifiable` and
+/// `rocket_jsonapi::Linkify`.
+///
+/// `JsonApiResponse` is a wrapper of `Result<Data,JsonApiResponseError>`, so constructing
+/// `JsonApiResponse` is as simple as `JsonApiResponse(Ok(data))`.
 ///
 /// # Example
 ///
@@ -88,10 +102,10 @@ pub trait ResourceIdentifiable {
 /// # #[macro_use]
 /// # use rocket::*;
 /// # use crate::rocket_jsonapi::response::JsonApiResponse;
-/// # use crate::rocket_jsonapi::{Linkify, ResourceIdentifiable};
+/// # use crate::rocket_jsonapi::{Linkify, ResourceType, ResourceIdentifiable};
 /// # use serde::Serialize;
 /// #
-/// #[derive(Serialize, ResourceIdentifiable, Linkify)]
+/// #[derive(Serialize, ResourceType, ResourceIdentifiable, Linkify)]
 /// struct Test {
 ///    id: i32,
 ///    message: String,
@@ -137,9 +151,9 @@ pub trait ResourceIdentifiable {
 /// # use rocket::http::Status;
 /// # use crate::rocket_jsonapi::response::JsonApiResponse;
 /// # use crate::rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
-/// # use crate::rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable};
+/// # use crate::rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable, ResourceType};
 /// # use serde::Serialize;
-/// #[derive(Serialize, ResourceIdentifiable, Linkify)]
+/// #[derive(Serialize, ResourceType, ResourceIdentifiable, Linkify)]
 /// struct Test {
 ///    id: i32,
 ///    message: String,
@@ -209,16 +223,21 @@ impl<'r, Data> Responder<'r> for JsonApiResponse<Data>
 where
     Data: Serialize + ResourceIdentifiable + Linkify,
 {
-    fn respond_to(self, request: &Request<'_>) -> Result<Response<'r>, Status> {
-        let json_api_mt = MediaType::new("application", "vnd.api+json");
+    fn respond_to(self, _request: &Request<'_>) -> Result<Response<'r>, Status> {
         // TODO improve or think about what to do in this case...
         let response = serialize(&self).map_err(|_e| Status::InternalServerError)?;
+
         match self.0 {
-            Ok(_data) => Content(ContentType(json_api_mt), response).respond_to(request),
+            Ok(_data) => Ok(Response::build()
+                .header(ContentType::JsonApi)
+                .sized_body(Cursor::new(response))
+                .finalize()),
             Err(error) => {
-                let mut response =
-                    Content(ContentType(json_api_mt), response).respond_to(request)?;
-                response.set_status(error.get_error_code());
+                let response = Response::build()
+                    .header(ContentType::JsonApi)
+                    .status(error.get_error_code())
+                    .sized_body(Cursor::new(response))
+                    .finalize();
                 Ok(response)
             }
         }

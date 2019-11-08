@@ -116,6 +116,7 @@ mod tests {
     use crate::core::data_object::{
         JsonApiPrimaryDataObject, JsonApiPrimaryDataObjectArray, ResourceIdentifiableWrapper,
     };
+    use crate::response::ResourceType;
     use crate::{Linkify, ResourceIdentifiable};
     use serde::Serialize;
     use serde_json::json;
@@ -126,12 +127,14 @@ mod tests {
         message: String,
     }
 
-    impl ResourceIdentifiable for Test {
-        type IdType = i32;
-
+    impl ResourceType for Test {
         fn get_type(&self) -> &'static str {
             &"Test"
         }
+    }
+
+    impl ResourceIdentifiable for Test {
+        type IdType = i32;
 
         fn get_id(&self) -> &Self::IdType {
             &self.id
@@ -166,12 +169,13 @@ mod tests {
             id: Box<String>,
             message: String,
         }
-        impl ResourceIdentifiable for T {
-            type IdType = Box<String>;
-
+        impl ResourceType for T {
             fn get_type(&self) -> &'static str {
                 &"T"
             }
+        }
+        impl ResourceIdentifiable for T {
+            type IdType = Box<String>;
 
             fn get_id(&self) -> &Self::IdType {
                 &self.id

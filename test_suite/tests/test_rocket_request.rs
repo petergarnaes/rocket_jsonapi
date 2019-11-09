@@ -81,11 +81,6 @@ fn test_data_request_simple_ok() {
     let mut request = client.post("/simple_data");
     request.add_header(Header::new("Content-Type", "application/vnd.api+json"));
     request.add_header(Header::new("Accept", "application/vnd.api+json"));
-    let bob = serde_json::to_string(&JsonApiResponse(Ok(Test {
-        id: 1,
-        message: String::from("dab"),
-    })));
-    println!("{}", bob.unwrap());
     request = request.body(
         r#"
         {
@@ -110,15 +105,27 @@ fn test_data_request_simple_ok() {
     );
 }
 
-/*
 #[test]
 fn test_request_accept_header_least_one_valid() {
-    let rocket = rocket::ignite().mount("/", routes![simple]);
+    let rocket = rocket::ignite().mount("/", routes![simple_data]);
     let client = Client::new(rocket).expect("valid rocket instance");
-    let mut request = client.get("/simple");
+    let mut request = client.post("/simple_data");
     //request.add_header(Header::new("Content-Type", "application/vnd.api+json"));
     request.add_header(Header::new("Accept", "application/vnd.api+json; arg=val"));
     request.add_header(Header::new("Accept", "application/vnd.api+json"));
+    request = request.body(
+        r#"
+        {
+            "data": {
+                "type": "Test",
+                "attributes": {
+                    "id": 1,
+                    "message": "Hay!"
+                }
+            }
+        }
+        "#,
+    );
     let response = request.dispatch();
     // Test HTTP status code
     assert_eq!(response.status(), Status::NotAcceptable);
@@ -126,10 +133,23 @@ fn test_request_accept_header_least_one_valid() {
 
 #[test]
 fn test_data_request_missing_content_type_header() {
-    let rocket = rocket::ignite().mount("/", routes![simple]);
+    let rocket = rocket::ignite().mount("/", routes![simple_data]);
     let client = Client::new(rocket).expect("valid rocket instance");
-    let mut request = client.get("/simple");
+    let mut request = client.post("/simple_data");
     request.add_header(Header::new("Accept", "application/vnd.api+json"));
+    request = request.body(
+        r#"
+        {
+            "data": {
+                "type": "Test",
+                "attributes": {
+                    "id": 1,
+                    "message": "Hay!"
+                }
+            }
+        }
+        "#,
+    );
     let response = request.dispatch();
     // Test HTTP status code
     assert_eq!(response.status(), Status::UnsupportedMediaType);
@@ -137,14 +157,27 @@ fn test_data_request_missing_content_type_header() {
 
 #[test]
 fn test_data_request_content_type_header_with_params_415() {
-    let rocket = rocket::ignite().mount("/", routes![simple]);
+    let rocket = rocket::ignite().mount("/", routes![simple_data]);
     let client = Client::new(rocket).expect("valid rocket instance");
-    let mut request = client.get("/simple");
+    let mut request = client.post("/simple_data");
     request.add_header(Header::new(
         "Content-Type",
         "application/vnd.api+json; chartset=UTF-8",
     ));
     request.add_header(Header::new("Accept", "application/vnd.api+json"));
+    request = request.body(
+        r#"
+        {
+            "data": {
+                "type": "Test",
+                "attributes": {
+                    "id": 1,
+                    "message": "Hay!"
+                }
+            }
+        }
+        "#,
+    );
     let response = request.dispatch();
     // Test HTTP status code
     assert_eq!(response.status(), Status::UnsupportedMediaType);
@@ -152,17 +185,29 @@ fn test_data_request_content_type_header_with_params_415() {
 
 #[test]
 fn test_data_request_content_type_header_least_one_valid() {
-    let rocket = rocket::ignite().mount("/", routes![simple]);
+    let rocket = rocket::ignite().mount("/", routes![simple_data]);
     let client = Client::new(rocket).expect("valid rocket instance");
-    let mut request = client.get("/simple");
+    let mut request = client.post("/simple_data");
     request.add_header(Header::new(
         "Content-Type",
         "application/vnd.api+json; chartset=UTF-8",
     ));
     request.add_header(Header::new("Content-Type", "application/vnd.api+json"));
     request.add_header(Header::new("Accept", "application/vnd.api+json"));
+    request = request.body(
+        r#"
+        {
+            "data": {
+                "type": "Test",
+                "attributes": {
+                    "id": 1,
+                    "message": "Hay!"
+                }
+            }
+        }
+        "#,
+    );
     let response = request.dispatch();
     // Test HTTP status code
     assert_eq!(response.status(), Status::UnsupportedMediaType);
 }
-*/

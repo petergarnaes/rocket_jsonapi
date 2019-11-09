@@ -97,7 +97,7 @@ where
                     }
                 }
                 // TODO check correct type with D::get_type() == resource_type
-                let _resource_type = match resource_type {
+                let resource_type = match resource_type {
                     Some(t) => t,
                     None => match serde::private::de::missing_field("type") {
                         Ok(val) => val,
@@ -111,6 +111,15 @@ where
                         Err(err) => return Err(err),
                     },
                 };
+                // Check type field of resource object to see that the given type matches the
+                // desired type
+                let recieved_type = attributes.get_type();
+                if recieved_type != resource_type {
+                    return Err(<A::Error as serde::de::Error>::invalid_value(
+                        serde::de::Unexpected::Str(recieved_type),
+                        &resource_type.as_str(),
+                    ));
+                }
                 Ok(InputDataWrapper(attributes))
             }
         }
@@ -129,6 +138,7 @@ where
 // Make this Data deserializer using the above resource object deserializer. Only consider 1 data
 // element, as spec says only 1 can be inserted at a time
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct JsonApiCreateResource<InputData: ResourceType> {
     pub data: InputDataWrapper<InputData>,
 }
@@ -198,8 +208,143 @@ mod tests {
     }
 
     #[test]
-    fn deserialize_resource_object_invalid_type() {}
+    fn deserialize_resource_object_invalid_type() {
+        let resource_object_json_raw = r#"
+            {
+                "type": "NotTheRightType",
+                "attributes": {
+                    "message": "Hello",
+                    "stock": 12
+                }
+            }
+        "#;
+        let resource_object_test: serde_json::error::Result<InputDataWrapper<Test>> =
+            serde_json::from_str(resource_object_json_raw);
+        match resource_object_test {
+            Ok(_res) => assert!(false),
+            Err(err) => assert!(err.is_data()),
+        }
+    }
 
     #[test]
-    fn deserialize_resource_object_invalid_object() {}
+    fn deserialize_resource_object_invalid_object() {
+        let resource_object_json_raw = r#"
+            {
+                "type": "NotTheRightType",
+                "attributes": [
+                    "message": "Hello",
+                    "stock": 12
+                ]
+            }
+        "#;
+        let resource_object_test: serde_json::error::Result<InputDataWrapper<Test>> =
+            serde_json::from_str(resource_object_json_raw);
+        match resource_object_test {
+            Ok(_res) => assert!(false),
+            Err(err) => assert!(err.is_syntax()),
+        }
+    }
+
+    #[test]
+    fn deserialize_resource_object_invalid_attributes() {
+        let resource_object_json_raw = r#"
+            {
+                "type": "NotTheRightType",
+                "attributes": {
+                    "message": "Hello",
+                    "stock": 12,
+                    "should_not_be_here": true
+                }
+            }
+        "#;
+        let resource_object_test: serde_json::error::Result<InputDataWrapper<Test>> =
+            serde_json::from_str(resource_object_json_raw);
+        match resource_object_test {
+            Ok(_res) => assert!(false),
+            Err(err) => assert!(err.is_data()),
+        }
+    }
+
+    #[test]
+    fn deserialize_resource_object_duplicate_field() {
+        let resource_object_json_raw = r#"
+            {
+                "type": "Test",
+                "type": "Test",
+                "attributes": {
+                    "message": "Hello",
+                    "stock": 12
+                }
+            }
+        "#;
+        let resource_object_test: serde_json::error::Result<InputDataWrapper<Test>> =
+            serde_json::from_str(resource_object_json_raw);
+        match resource_object_test {
+            Ok(_res) => assert!(false),
+            Err(err) => assert!(err.is_data()),
+        }
+    }
+
+    #[test]
+    fn deserialize_resource_object_invalid_unknown_fields() {
+        let resource_object_json_raw = r#"
+            {
+                "should_not_be_here": true,
+                "type": "Test",
+                "attributes": {
+                    "message": "Hello",
+                    "stock": 12
+                }
+            }
+        "#;
+        let resource_object_test: serde_json::error::Result<InputDataWrapper<Test>> =
+            serde_json::from_str(resource_object_json_raw);
+        match resource_object_test {
+            Ok(_res) => assert!(false),
+            Err(err) => assert!(err.is_data()),
+        }
+    }
+
+    #[test]
+    fn deserialize_data_resource_object_invalid_field() {
+        let resource_object_json_raw = r#"
+            {
+                "sometinh_other_than_data": {
+                    "type": "Test",
+                    "attributes": {
+                        "message": "Hello",
+                        "stock": 12
+                    }
+                }
+            }
+        "#;
+        let resource_object_test: serde_json::Result<JsonApiCreateResource<Test>> =
+            serde_json::from_str(resource_object_json_raw);
+        match resource_object_test {
+            Ok(_res) => assert!(false),
+            Err(err) => assert!(err.is_data()),
+        }
+    }
+
+    #[test]
+    fn deserialize_data_resource_object_invalid_unknown_fields() {
+        let resource_object_json_raw = r#"
+            {
+                "data": {
+                    "type": "Test",
+                    "attributes": {
+                        "message": "Hello",
+                        "stock": 12
+                    }
+                },
+                "should_not_be_here": true
+            }
+        "#;
+        let resource_object_test: serde_json::Result<JsonApiCreateResource<Test>> =
+            serde_json::from_str(resource_object_json_raw);
+        match resource_object_test {
+            Ok(_res) => assert!(false),
+            Err(err) => assert!(err.is_data()),
+        }
+    }
 }

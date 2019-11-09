@@ -1,4 +1,4 @@
-/home/pag/Projects/hopper-backend/shop-api# TODO
+# TODO
 
 ## Crate stuff
 
@@ -54,12 +54,14 @@
     - Look into if reader interface of Data input is an attack vector for DoS
     - Are we using the right errors in our `FromRequest` and `FromData` implementation in our `FromRequest` and `FromData` implementationss?
  - [x] Implement `JsonApi` as a [data guard](https://api.rocket.rs/v0.4/rocket/data/trait.FromData.html)
-    - Testing POST data requests w. deserialization
-    - Negative testing POST data requests w. deserialization
+    - [x] Testing POST data requests w. deserialization
+    - [x] Negative testing POST data requests w. deserialization
  - Proper deserialization of input data types
     - [x] deserialising input types for insert requests
-    - Implement type check
-    - Negative testing of deserializing input types for insert
+    - [x] Implement type check
+    - [x] Deny unkown fields for resource type deserializing
+    - [x] Deny unkown fields for data wrapper deserializing 
+    - [x] Negative testing of deserializing input types for insert
     - Support deserializing relationships for input types for insert
     - deserialising input types for update (with id) requests
     - Negative testing of deserializing input types for update (with id)

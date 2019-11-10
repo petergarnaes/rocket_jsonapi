@@ -123,7 +123,7 @@ where
                 Ok(InputDataWrapper(attributes))
             }
         }
-        const FIELDS: &'static [&'static str] = &["type", "attributes"];
+        const FIELDS: &'static [&str] = &["type", "attributes"];
         deserializer.deserialize_struct(
             "InputDataWrapper",
             FIELDS,

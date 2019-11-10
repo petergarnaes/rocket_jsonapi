@@ -1,7 +1,7 @@
 //! # Responding with errors
 //!
 //! JSON:API allows responding with an error state. This module defines the Err return type of
-//! `JsonApiResponse` and related definitions.
+//! `JsonApiDataResponse` and related definitions.
 //!
 //! ## Example
 //!
@@ -43,7 +43,7 @@ type ErrorCode = Status;
 ///
 /// Is constructed by a http status code and a list of `JsonApiError` that are JSON:API compatible
 #[derive(Debug)]
-pub struct JsonApiResponseError(ErrorCode, Vec<JsonApiError>);
+pub struct JsonApiResponseError(pub ErrorCode, pub Vec<JsonApiError>);
 
 impl JsonApiResponseError {
     /// Constructs instance of `JsonApiResponseError`
@@ -100,6 +100,11 @@ impl JsonApiResponseError {
     /// Returns http status code of the error
     pub fn get_error_code(self) -> Status {
         self.0
+    }
+
+    /// Returns http status code of the error
+    pub fn get_errors(self) -> Vec<JsonApiError> {
+        self.1
     }
 }
 

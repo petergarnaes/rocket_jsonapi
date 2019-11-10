@@ -18,13 +18,13 @@
     - Create macro similar to `vec!` that takes different types of elements that implements `Into<JsonApiError>` and
      returns `JsonApiResponseError`.
     - [x] `Serialize` testing
-    - [x] Integrate with JsonApiResponse
+    - [x] Integrate with JsonApiDataResponse
     - [x] Maybe use Rocket.js error codes, if they have it, instead of error code being a u32?
     - [x] Better error macro, that uses [Push-down accumulation](https://danielkeep.github.io/tlborm/book/pat-push-down-accumulation.html)
     and maybe some [incremental TT munching](https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html)
     to generate a proper JsonApiError constructor, instead of mutating it one field at a time.
     - [x] Test top level serializing of errors
-    - Change `JsonApiResponse` to take Vec of errors that implement `AsJsonApiError`? `JsonApiError` can have default 
+    - Change `JsonApiDataResponse` to take Vec of errors that implement `AsJsonApiError`? `JsonApiError` can have default 
     implementation. But what about ErrorCode?
     - Implement `source` field for `JsonApiError`
     - Implement `links` field for `JsonApiError`
@@ -38,7 +38,7 @@
  - [x] Hide `ResourceIdentifier` from user, move to core
  - [x] Make `ResourceIdentifierWrapper` with serialization implementation, so when constructing resource identifiers, we
   can simply read the objects we convert, instead of constructing new.
- - [x] Write full-stack'ish serialization tests for `JsonApiResponse` with all sorts of implementations for the wrapped
+ - [x] Write full-stack'ish serialization tests for `JsonApiDataResponse` with all sorts of implementations for the wrapped
   type.
  - [x] Move many of the tests of public APIs to `test_suite` crate
  - Test derive of `ResourceType`
@@ -48,7 +48,7 @@
  - Make all our traits derivable with newtypes, so inheritance boilerplate can be reduced. This pattern could make
   for some nifty implementations with heavy re-use of code through inheritance, only overriding the parts the user
    wishes. For example, a `Person` could also be used as a relationship, like `Author`, but where `links` are changed
-   , or maybe entirely excluded.
+   , or maybe entirely excluded. See serde transparent attribute
  - [x] Implement `JsonApi` as a [request guard](https://rocket.rs/v0.4/guide/requests/#custom-guards), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
     - Look into if reader interface of Data input is an attack vector for DoS
@@ -70,7 +70,11 @@
     - Support client generated ID for insert statement
  - [x] Implement `JsonApi` as a [responser](https://rocket.rs/v0.4/guide/responses/#custom-responders), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
- - [x] Test `JsonApiResponse` as a `Responder`
+ - [x] Test `JsonApiDataResponse` as a `Responder`
+ - [x] Make `JsonApiCreateResponse` with all the different types of responses allowed for creating data
+ - Test `JsonApiCreateResponse`
+ - [x] Make `JsonApiUpdateResponse` with all the different types of responses allowed for creating data
+ - Test `JsonApiUpdateResponse`
  - Tests for `JsonApi`
  - Probably a ton more, that I forgot...
  

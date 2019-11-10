@@ -38,7 +38,7 @@ extern crate rocket_contrib;
 extern crate serde;
 
 use rocket_jsonapi::request::JsonApiRequest;
-use rocket_jsonapi::response::JsonApiResponse;
+use rocket_jsonapi::response::JsonApiDataResponse;
 
 ##[derive(Serialize, ResourceIdentifiable, Linkify, Relationships)]
 struct TestData {
@@ -46,9 +46,9 @@ struct TestData {
 }
 
 ##[get("/test_data")]
-fn test_data(json_api_repuest: JsonApiRequest) -> JsonApiResponse<TestData> {
+fn test_data(json_api_repuest: JsonApiRequest) -> JsonApiDataResponse<TestData> {
     let test = TestData {id: String::from("1")};
-    JsonApiResponse(Ok(test))
+    JsonApiDataResponse(Ok(test))
 }
 
 fn main() {
@@ -57,7 +57,7 @@ fn main() {
         .launch();
 }
 ```
-By deriving `ResourceIdentifiable`, `Linkify` and `Relationships` it is possible for `JsonApiResponse` to figure out 
+By deriving `ResourceIdentifiable`, `Linkify` and `Relationships` it is possible for `JsonApiDataResponse` to figure out 
 the `id` of the data, create links and relationships. If no macro attributes are set, empty implementations will be 
 derived, and the response will only include a `data` object in the response.
 

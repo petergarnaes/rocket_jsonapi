@@ -2,8 +2,8 @@
 // Test that the various parts serialize properly
 use rocket::http::Status;
 use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
-use rocket_jsonapi::response::{JsonApiResponse, ResourceType};
-use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable};
+use rocket_jsonapi::response::JsonApiDataResponse;
+use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable, ResourceType};
 use serde::Serialize;
 use serde_json::json;
 
@@ -36,7 +36,7 @@ fn serialize_json_api_response() {
         message: "Hello".to_string(),
     };
     let test_instance_value =
-        serde_json::to_value(JsonApiResponse::<Test>(Ok(test_instance))).unwrap();
+        serde_json::to_value(JsonApiDataResponse::<Test>(Ok(test_instance))).unwrap();
     let test_equals_value = json!({
         "data": {
             "id": "5",
@@ -60,7 +60,7 @@ fn serialize_json_api_response_array() {
         id: 6,
         message: "World".to_string(),
     };
-    let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(Ok(vec![
+    let test_instance_value = serde_json::to_value(JsonApiDataResponse::<Vec<Test>>(Ok(vec![
         test_instance1,
         test_instance2,
     ])))
@@ -95,7 +95,7 @@ fn serialize_json_api_response_error() {
         title = String::from("Medium error"),
         code = String::from("17")
     );
-    let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(Err(
+    let test_instance_value = serde_json::to_value(JsonApiDataResponse::<Vec<Test>>(Err(
         JsonApiResponseError::new(Status::BadRequest, vec![test_error1, test_error2]),
     )))
     .unwrap();

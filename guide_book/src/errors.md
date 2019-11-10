@@ -1,18 +1,18 @@
 # How to respond with errors
 
-Remember that `JsonApiResponse` takes as input a `Result<Data, JsonApiResponseError>`. A `JsonApiResponseError` takes an
+Remember that `JsonApiDataResponse` takes as input a `Result<Data, JsonApiResponseError>`. A `JsonApiResponseError` takes an
 error code and a `JsonApiError` as arguments. An example:
 ```rust
 use rocket_jsonapi::json_api_error;
 use rocket::http::Status;
 
 ##[get("/error")]
-fn always_errors(request: JsonApiRequest) -> JsonApiResponse<()> {
+fn always_errors(request: JsonApiRequest) -> JsonApiDataResponse<()> {
     let error = json_api_error!(
         status = String::from("400"),
         detail = String::from("Always happens"),
     );
-    JsonApiResponse(Err(JsonApiResponseError(Status::BadRequest, vec![error])))
+    JsonApiDataResponse(Err(JsonApiResponseError(Status::BadRequest, vec![error])))
 }
 ```
 

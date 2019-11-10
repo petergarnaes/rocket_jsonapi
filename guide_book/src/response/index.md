@@ -3,8 +3,8 @@
 A basic example of how to respond can be seen in [getting started - hello world](/getting-started.md#hello-world).
 
 `rocket_jsonapi` provides a [responder](https://rocket.rs/v0.4/guide/responses/#responder) called 
-`JsonApiResponse<Data>(Result<Data, JsonApiResponseError>)`.
-The user provided `struct` given to `JsonApiResponse` must implement the following traits:
+`JsonApiDataResponse<Data>(Result<Data, JsonApiResponseError>)`.
+The user provided `struct` given to `JsonApiDataResponse` must implement the following traits:
  - `ResourceIdentifiable`, ensures the data can be parsed as a [resource object](https://jsonapi.org/format/#document-resource-objects).
  [Details here](/response/resources.md).
  - `Linkify`, ensures the [links](https://jsonapi.org/format/#document-links) metadata is returned in the response, if 

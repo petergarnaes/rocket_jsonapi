@@ -1,19 +1,16 @@
 //! # Validating JSON:API requests
 use crate::core::input_data::JsonApiCreateResource;
 use crate::lib::*;
-use crate::response::ResourceType;
+use crate::resource::ResourceType;
 use rocket::data::{self, FromDataSimple};
 use rocket::http::{ContentType, MediaType, Status};
 use rocket::request::{self, FromRequest};
 use rocket::Data;
 use rocket::Request;
-use serde::de::MapAccess;
-use serde::export::fmt::Error;
-use serde::export::{Formatter, PhantomData};
-use std::ops::Deref;
 
 pub struct JsonApiRequest;
 // TODO change name to reflect that it can only be used for insert/update
+// TODO add Option<ClientId>? How do we help users return a 403 if unsupported? Make enum?
 pub struct JsonApiDataRequest<Data>(pub Data);
 // TODO create struct for PATCH requests, creates some sort of key/value set to let user deal with
 

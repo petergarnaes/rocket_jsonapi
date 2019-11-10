@@ -19,7 +19,7 @@ mod core;
 
 mod lib {
     pub use crate::links::*;
-    pub use crate::response::ResourceIdentifiable;
+    pub use crate::resource::ResourceIdentifiable;
     pub use serde::de::Visitor;
     pub use serde::ser::{SerializeSeq, SerializeStruct};
     pub use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -27,9 +27,10 @@ mod lib {
 }
 
 pub mod info;
+pub mod resource;
 pub mod response;
-pub use response::ResourceIdentifiable;
-pub use response::ResourceType;
+pub use resource::ResourceIdentifiable;
+pub use resource::ResourceType;
 pub mod request;
 
 // Exposing Linkify on root level path, because macros can only be on root level

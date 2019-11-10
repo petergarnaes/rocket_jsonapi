@@ -7,7 +7,7 @@ extern crate rocket;
 use rocket::http::Status;
 use rocket::local::Client;
 use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
-use rocket_jsonapi::response::JsonApiResponse;
+use rocket_jsonapi::response::JsonApiDataResponse;
 use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable, ResourceType};
 use serde::Serialize;
 use serde_json::{from_str, json, Value};
@@ -19,16 +19,16 @@ struct Test {
 }
 
 #[get("/simple")]
-fn simple() -> JsonApiResponse<Test> {
-    JsonApiResponse(Ok(Test {
+fn simple() -> JsonApiDataResponse<Test> {
+    JsonApiDataResponse(Ok(Test {
         id: 1,
         message: String::from("Hello!"),
     }))
 }
 
 #[get("/simple_error")]
-fn simple_error() -> JsonApiResponse<Test> {
-    JsonApiResponse(Err(JsonApiResponseError::new(
+fn simple_error() -> JsonApiDataResponse<Test> {
+    JsonApiDataResponse(Err(JsonApiResponseError::new(
         Status::NotAcceptable,
         vec![json_api_error!(
             id = String::from("5"),

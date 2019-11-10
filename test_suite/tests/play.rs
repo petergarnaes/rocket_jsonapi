@@ -4,7 +4,7 @@ use rocket_jsonapi::links::{LinkObject, Linkify, LinksObject};
 use rocket_jsonapi::relationship::{
     AllRelationships, HaveRelationship, RelationObject, RelationObjectify,
 };
-use rocket_jsonapi::response::ResourceType;
+use rocket_jsonapi::resource::ResourceType;
 use rocket_jsonapi::ResourceIdentifiable;
 use serde::Serialize;
 

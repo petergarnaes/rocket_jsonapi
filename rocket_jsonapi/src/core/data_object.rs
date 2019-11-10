@@ -116,7 +116,7 @@ mod tests {
     use crate::core::data_object::{
         JsonApiPrimaryDataObject, JsonApiPrimaryDataObjectArray, ResourceIdentifiableWrapper,
     };
-    use crate::response::ResourceType;
+    use crate::resource::ResourceType;
     use crate::{Linkify, ResourceIdentifiable};
     use serde::Serialize;
     use serde_json::json;

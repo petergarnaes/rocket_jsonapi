@@ -1,5 +1,5 @@
 use crate::lib::*;
-use crate::response::ResourceType;
+use crate::resource::ResourceType;
 
 /// Object to represent a "resource identifier object", which is an object that identifies an
 /// individual resource. [See specification](https://jsonapi

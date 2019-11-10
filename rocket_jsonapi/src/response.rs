@@ -170,8 +170,11 @@ where
 }
 
 pub enum JsonApiCreateResponse<Data> {
+    /// Data is accepted and created
     Created(Data),
+    /// Used when data is accepted, but maybe needs asynchronous processing and is not created yet
     Accepted(Data),
+    /// Used when responding as a 201 create, but with no returned data.
     NoContent,
     UnsupportedClientId(Option<Vec<JsonApiError>>),
     Forbidden(Option<Vec<JsonApiError>>),

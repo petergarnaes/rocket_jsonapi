@@ -7,7 +7,7 @@ extern crate rocket;
 use rocket::http::{Header, Status};
 use rocket::local::Client;
 use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
-use rocket_jsonapi::request::{JsonApiDataRequest, JsonApiRequest};
+use rocket_jsonapi::request::{JsonApiCreateRequest, JsonApiRequest};
 use rocket_jsonapi::response::JsonApiDataResponse;
 use rocket_jsonapi::{json_api_error, Linkify, ResourceIdentifiable, ResourceType};
 use serde::Deserialize;
@@ -29,7 +29,7 @@ fn simple(_req: JsonApiRequest) -> JsonApiDataResponse<Test> {
 }
 
 #[post("/simple_data", data = "<input>")]
-fn simple_data(input: JsonApiDataRequest<Test>) -> JsonApiDataResponse<Test> {
+fn simple_data(input: JsonApiCreateRequest<Test>) -> JsonApiDataResponse<Test> {
     JsonApiDataResponse(Ok(input.0))
 }
 

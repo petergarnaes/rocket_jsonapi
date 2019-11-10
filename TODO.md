@@ -63,13 +63,19 @@
     - [x] Deny unkown fields for data wrapper deserializing 
     - [x] Negative testing of deserializing input types for insert
     - Support deserializing relationships for input types for insert
-    - deserialising input types for update (with id) requests
+    - [x] deserialising input types for update (with id) requests
     - Negative testing of deserializing input types for update (with id)
     - Support deserializing relationships for input types for update (with id)
-    - Deserialize input type with variable fields for PATCH updates
+    - [x] Deserialize input type with variable fields for PATCH updates
     - Support client generated ID for insert statement
  - [x] Implement `JsonApi` as a [responser](https://rocket.rs/v0.4/guide/responses/#custom-responders), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
+ - [x] Implement `JsonApiCreateRequest`
+ - Test `JsonApiCreateRequest`
+ - [x] Implement `JsonApiUpdateRequest`
+    - Make `ResourceType`'s only method `get_type` static: `fn get_type() -> &'static str`
+    - Make `JsonApiUpdateRequest` generic on `InputData` so it can validate type of incomming request incomming request
+ - Test `JsonApiUpdateRequest`
  - [x] Test `JsonApiDataResponse` as a `Responder`
  - [x] Make `JsonApiCreateResponse` with all the different types of responses allowed for creating data
  - Test `JsonApiCreateResponse`

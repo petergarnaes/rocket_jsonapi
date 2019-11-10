@@ -3,6 +3,7 @@ use serde::de::{MapAccess, Visitor};
 use serde::export::fmt::Error;
 use serde::export::Formatter;
 use serde::{Deserialize, Deserializer};
+use serde_json::{Map, Value};
 use std::marker::PhantomData;
 use std::ops::Deref;
 
@@ -135,16 +136,31 @@ where
     }
 }
 
-// Make this Data deserializer using the above resource object deserializer. Only consider 1 data
-// element, as spec says only 1 can be inserted at a time
+/// Data type representing the deserialized document of a json:api POST request
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct JsonApiCreateResource<InputData: ResourceType> {
     pub data: InputDataWrapper<InputData>,
 }
 
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct UpdateWrapper {
+    pub id: String,
+    #[serde(rename = "type")]
+    pub resource_type: String,
+    pub attributes: Map<String, Value>,
+}
+
+/// Data type representing the deserialized document of a json:api PATCH request
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct JsonApiUpdateResource {
+    pub data: UpdateWrapper,
+}
+
 #[cfg(test)]
-mod tests {
+mod test_create_resource {
     use crate::core::input_data::{InputDataWrapper, JsonApiCreateResource};
     use crate::ResourceType;
     use serde::Deserialize;
@@ -346,5 +362,53 @@ mod tests {
             Ok(_res) => assert!(false),
             Err(err) => assert!(err.is_data()),
         }
+    }
+}
+
+#[cfg(test)]
+mod test_update_resource {
+    use crate::core::input_data::{JsonApiUpdateResource, UpdateWrapper};
+    use crate::ResourceType;
+    use serde::Deserialize;
+    use serde_json::{Map, Value};
+
+    #[derive(Deserialize, PartialEq, Debug)]
+    struct Test {
+        a: String,
+        b: i64,
+        c: bool,
+    }
+
+    impl ResourceType for Test {
+        fn get_type(&self) -> &'static str {
+            &"Test"
+        }
+    }
+
+    #[test]
+    fn deserialize_patch_object() {
+        let resource_object_json_raw = r#"
+            {
+                "id": "5",
+                "type": "Test",
+                "attributes": {
+                    "message": "Hello"
+                }
+            }
+        "#;
+        // TODO
+        // let resource_object_test: UpdateWrapper<Test> =
+        let resource_object_test: UpdateWrapper =
+            serde_json::from_str(resource_object_json_raw).unwrap();
+        assert_eq!(resource_object_test.id.as_str(), "5");
+        assert_eq!(resource_object_test.resource_type.as_str(), "Test");
+        assert!(resource_object_test.attributes.contains_key("message"));
+        assert!(match resource_object_test.attributes.get("message") {
+            Some(val) => match val {
+                Value::String(string) => string.as_str() == "Hello",
+                _ => false,
+            },
+            None => false,
+        });
     }
 }

@@ -1,5 +1,5 @@
 //! # Validating JSON:API requests
-use crate::core::input_data::JsonApiCreateResource;
+use crate::core::input_data::{JsonApiCreateResource, JsonApiUpdateResource};
 use crate::lib::*;
 use crate::resource::ResourceType;
 use rocket::data::{self, FromDataSimple};
@@ -7,12 +7,15 @@ use rocket::http::{ContentType, MediaType, Status};
 use rocket::request::{self, FromRequest};
 use rocket::Data;
 use rocket::Request;
+use serde_json::{Map, Value};
 
 pub struct JsonApiRequest;
-// TODO change name to reflect that it can only be used for insert/update
 // TODO add Option<ClientId>? How do we help users return a 403 if unsupported? Make enum?
-pub struct JsonApiDataRequest<Data>(pub Data);
-// TODO create struct for PATCH requests, creates some sort of key/value set to let user deal with
+pub struct JsonApiCreateRequest<Data>(pub Data);
+pub struct JsonApiUpdateRequest {
+    pub id: String,
+    pub attributes: Map<String, Value>,
+}
 
 fn acceptable_json_api_content_type(request: &Request) -> Result<(), Status> {
     // JSON API v. 1.0
@@ -69,7 +72,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for JsonApiRequest {
     }
 }
 
-impl<InputData> FromDataSimple for JsonApiDataRequest<InputData>
+impl<InputData> FromDataSimple for JsonApiCreateRequest<InputData>
 where
     for<'de> InputData: ResourceType + Deserialize<'de>,
 {
@@ -83,7 +86,40 @@ where
                 let b: Result<JsonApiCreateResource<InputData>, serde_json::error::Error> =
                     serde_json::from_reader(data.open());
                 match b {
-                    Ok(result) => data::Outcome::Success(JsonApiDataRequest(result.data.0)),
+                    Ok(result) => data::Outcome::Success(JsonApiCreateRequest(result.data.0)),
+                    Err(err) => {
+                        println!("Error: {}", err);
+                        data::Outcome::Failure((Status::BadRequest, ()))
+                    }
+                }
+            }
+            Err(status) => data::Outcome::Failure((status, ())),
+        }
+    }
+}
+
+// TODO make it use InputData, make ResourceType fn get_type() -> &'static str, so its static and
+// can be called on the class
+//impl<InputData> FromDataSimple for JsonApiUpdateRequest
+impl FromDataSimple for JsonApiUpdateRequest
+//where
+//    for<'de> InputData: ResourceType + Deserialize<'de>,
+{
+    // TODO right error?
+    type Error = ();
+
+    fn from_data(request: &Request, data: Data) -> data::Outcome<Self, Self::Error> {
+        match acceptable_json_api_data_request(request) {
+            Ok(()) => {
+                // TODO does reader interface open up for DoS attacks
+                let b: Result<JsonApiUpdateResource, serde_json::error::Error> =
+                    serde_json::from_reader(data.open());
+                match b {
+                    // TODO check resource_type for match?
+                    Ok(result) => data::Outcome::Success(JsonApiUpdateRequest {
+                        id: result.data.id,
+                        attributes: result.data.attributes,
+                    }),
                     Err(err) => {
                         println!("Error: {}", err);
                         data::Outcome::Failure((Status::BadRequest, ()))

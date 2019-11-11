@@ -1,7 +1,6 @@
 //! # Responding with relationship metadata
 use crate::core::resource_identifier::ResourceIdentifierObject;
 use crate::lib::*;
-use std::marker::PhantomData;
 
 //pub type Relationship = Box<dyn ResourceIdentifiable>;
 //pub type Relationships = Vec<Relationship>;
@@ -22,6 +21,19 @@ where
             // TODO clone needed?
             id: res.get_id().to_string(),
             object_type: To::get_type(),
+        }
+    }
+}
+
+impl<Data> From<&Data> for ResIdenObjNonGeneric
+where
+    Data: ResourceIdentifiable,
+{
+    default fn from(data: &Data) -> Self {
+        ResIdenObjNonGeneric {
+            // TODO clone needed?
+            id: data.get_id().to_string(),
+            object_type: Data::get_type(),
         }
     }
 }
@@ -55,10 +67,7 @@ where
     default fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
         RelationObject {
-            data: vec![ResIdenObjNonGeneric {
-                id: rel.get_id().to_string(),
-                object_type: To::get_type(),
-            }],
+            data: vec![(&rel).into()],
             links: "".to_owned(),
         }
     }
@@ -72,13 +81,7 @@ where
     fn get_relation_object(&self) -> RelationObject {
         let rel = self.get_relation();
         RelationObject {
-            data: rel
-                .iter()
-                .map(|to| ResIdenObjNonGeneric {
-                    id: to.get_id().to_string(),
-                    object_type: To::get_type(),
-                })
-                .collect(),
+            data: rel.iter().map(|to| to.into()).collect(),
             links: "".to_owned(),
         }
     }

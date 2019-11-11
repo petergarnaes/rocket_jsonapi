@@ -1,7 +1,6 @@
 use crate::core::data_object::JsonApiPrimaryDataObject;
-use crate::error::{JsonApiError, JsonApiResponseError};
+use crate::error::JsonApiError;
 use crate::lib::*;
-use crate::response::JsonApiDataResponse;
 use rocket::http::{ContentType, Status};
 use rocket::response::Responder;
 use rocket::{Request, Response};
@@ -71,7 +70,7 @@ where
                 .status(self.0)
                 .sized_body(Cursor::new(response))
                 .finalize()),
-            Err(error) => {
+            Err(_error) => {
                 let response = Response::build()
                     .header(ContentType::JsonApi)
                     .status(self.0)

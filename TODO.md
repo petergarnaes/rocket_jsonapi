@@ -71,20 +71,22 @@
  - [x] Implement `JsonApi` as a [responser](https://rocket.rs/v0.4/guide/responses/#custom-responders), see rockets `Json
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
  - [x] Implement `JsonApiCreateRequest`
- - Test `JsonApiCreateRequest`
+ - [x] Test `JsonApiCreateRequest`
+    - Test `JsonApiCreateRequest` validation of type of incomming request
  - [x] Implement `JsonApiUpdateRequest`
     - [x] Make `ResourceType`'s only method `get_type` static: `fn get_type() -> &'static str`
-    - Make `JsonApiUpdateRequest` generic on `InputData` so it can validate type of incomming request
- - Test `JsonApiUpdateRequest`
+    - [x] Make `JsonApiUpdateRequest` generic on `InputData` so it can validate type of incomming request
+ - [x] Test `JsonApiUpdateRequest`
+    - Test `JsonApiUpdateRequest` validation of type of incomming request
  - [x] Test `JsonApiDataResponse` as a `Responder`
  - [x] Make `JsonApiCreateResponse` with all the different types of responses allowed for creating data
  - Test `JsonApiCreateResponse`
- - [x] Make `JsonApiUpdateResponse` with all the different types of responses allowed for creating data
+ - Make `JsonApiUpdateResponse` with all the different types of responses allowed for creating data
  - Test `JsonApiUpdateResponse`
- - Tests for `JsonApi`
  - Rename `resource_identifier` module. Right now the name does not quite reflect its content.
- - Carefully read about resource identifier objects. Can they be used as primary data? If so, should they be exposed as
- public, and moved out of `core` module?
+ - Move `ResourceObjectIdentifier` to the public API
+    - Make a newtype `ToResourceObjectIdentifier` that serializes the inner type as a resource object identifier
+ - Change `derive` of `ResourceType` to always use `#[inline]`
  - Probably a ton more, that I forgot...
  
 ## Documentation stuff

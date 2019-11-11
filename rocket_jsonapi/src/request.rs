@@ -7,14 +7,16 @@ use rocket::http::{ContentType, MediaType, Status};
 use rocket::request::{self, FromRequest};
 use rocket::Data;
 use rocket::Request;
+use serde::export::PhantomData;
 use serde_json::{Map, Value};
 
 pub struct JsonApiRequest;
 // TODO add Option<ClientId>? How do we help users return a 403 if unsupported? Make enum?
 pub struct JsonApiCreateRequest<Data>(pub Data);
-pub struct JsonApiUpdateRequest {
+pub struct JsonApiUpdateRequest<Data> {
     pub id: String,
     pub attributes: Map<String, Value>,
+    phantom: PhantomData<Data>,
 }
 
 fn acceptable_json_api_content_type(request: &Request) -> Result<(), Status> {
@@ -98,12 +100,9 @@ where
     }
 }
 
-// TODO make it use InputData, make ResourceType fn get_type() -> &'static str, so its static and
-// can be called on the class
-//impl<InputData> FromDataSimple for JsonApiUpdateRequest
-impl FromDataSimple for JsonApiUpdateRequest
-//where
-//    for<'de> InputData: ResourceType + Deserialize<'de>,
+impl<InputData> FromDataSimple for JsonApiUpdateRequest<InputData>
+where
+    for<'de> InputData: ResourceType + Deserialize<'de>,
 {
     // TODO right error?
     type Error = ();
@@ -116,10 +115,16 @@ impl FromDataSimple for JsonApiUpdateRequest
                     serde_json::from_reader(data.open());
                 match b {
                     // TODO check resource_type for match?
-                    Ok(result) => data::Outcome::Success(JsonApiUpdateRequest {
-                        id: result.data.id,
-                        attributes: result.data.attributes,
-                    }),
+                    Ok(result) => {
+                        if result.data.resource_type != InputData::get_type() {
+                            return data::Outcome::Failure((Status::BadRequest, ()));
+                        }
+                        data::Outcome::Success(JsonApiUpdateRequest::<InputData> {
+                            id: result.data.id,
+                            attributes: result.data.attributes,
+                            phantom: PhantomData,
+                        })
+                    }
                     Err(err) => {
                         println!("Error: {}", err);
                         data::Outcome::Failure((Status::BadRequest, ()))

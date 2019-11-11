@@ -97,7 +97,6 @@ where
                         }
                     }
                 }
-                // TODO check correct type with D::get_type() == resource_type
                 let resource_type = match resource_type {
                     Some(t) => t,
                     None => match serde::private::de::missing_field("type") {
@@ -370,7 +369,7 @@ mod test_update_resource {
     use crate::core::input_data::{JsonApiUpdateResource, UpdateWrapper};
     use crate::ResourceType;
     use serde::Deserialize;
-    use serde_json::{Map, Value};
+    use serde_json::Value;
 
     #[derive(Deserialize, PartialEq, Debug)]
     struct Test {
@@ -396,14 +395,39 @@ mod test_update_resource {
                 }
             }
         "#;
-        // TODO
-        // let resource_object_test: UpdateWrapper<Test> =
         let resource_object_test: UpdateWrapper =
             serde_json::from_str(resource_object_json_raw).unwrap();
         assert_eq!(resource_object_test.id.as_str(), "5");
         assert_eq!(resource_object_test.resource_type.as_str(), "Test");
         assert!(resource_object_test.attributes.contains_key("message"));
         assert!(match resource_object_test.attributes.get("message") {
+            Some(val) => match val {
+                Value::String(string) => string.as_str() == "Hello",
+                _ => false,
+            },
+            None => false,
+        });
+    }
+
+    #[test]
+    fn deserialize_data_patch_object() {
+        let resource_object_json_raw = r#"
+            {
+                "data": {
+                    "id": "5",
+                    "type": "Test",
+                    "attributes": {
+                        "message": "Hello"
+                    }
+                }
+            }
+        "#;
+        let resource_object_test: JsonApiUpdateResource =
+            serde_json::from_str(resource_object_json_raw).unwrap();
+        assert_eq!(resource_object_test.data.id.as_str(), "5");
+        assert_eq!(resource_object_test.data.resource_type.as_str(), "Test");
+        assert!(resource_object_test.data.attributes.contains_key("message"));
+        assert!(match resource_object_test.data.attributes.get("message") {
             Some(val) => match val {
                 Value::String(string) => string.as_str() == "Hello",
                 _ => false,

@@ -10,8 +10,6 @@ use crate::lib::*;
 use rocket::http::{ContentType, Status};
 use rocket::response::Responder;
 use rocket::{Request, Response};
-use serde_json::to_string as serialize;
-use std::io::Cursor;
 
 /// # JSON:API Responder
 ///

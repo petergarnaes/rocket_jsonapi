@@ -114,11 +114,11 @@ where
                 };
                 // Check type field of resource object to see that the given type matches the
                 // desired type
-                let recieved_type = attributes.get_type();
-                if recieved_type != resource_type {
+                let expected_type = D::get_type();
+                if expected_type != resource_type {
                     return Err(<A::Error as serde::de::Error>::invalid_value(
-                        serde::de::Unexpected::Str(recieved_type),
-                        &resource_type.as_str(),
+                        serde::de::Unexpected::Str(resource_type.as_str()),
+                        &expected_type,
                     ));
                 }
                 Ok(InputDataWrapper(attributes))
@@ -172,7 +172,7 @@ mod test_create_resource {
     }
 
     impl ResourceType for Test {
-        fn get_type(&self) -> &'static str {
+        fn get_type() -> &'static str {
             &"Test"
         }
     }
@@ -380,7 +380,7 @@ mod test_update_resource {
     }
 
     impl ResourceType for Test {
-        fn get_type(&self) -> &'static str {
+        fn get_type() -> &'static str {
             &"Test"
         }
     }

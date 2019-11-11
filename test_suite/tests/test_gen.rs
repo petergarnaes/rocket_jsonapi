@@ -26,7 +26,7 @@ fn test_gen_resource_identifiable_simple() {
         id: "1".to_string(),
         bob: Box::new("bob".to_string()),
     };
-    assert_eq!("SimpleResource", simple_resource.get_type());
+    assert_eq!("SimpleResource", SimpleResource::get_type());
     assert_eq!("1", simple_resource.get_id());
 }
 
@@ -43,7 +43,7 @@ fn test_gen_resource_identifiable_custom_type() {
         id: "1".to_string(),
         bob: Box::new("bob".to_string()),
     };
-    assert_eq!("test", simple_resource.get_type());
+    assert_eq!("test", SimpleResourceCustomType::get_type());
     assert_eq!("1", simple_resource.get_id());
 }
 

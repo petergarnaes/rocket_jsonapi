@@ -73,8 +73,8 @@
  - [x] Implement `JsonApiCreateRequest`
  - Test `JsonApiCreateRequest`
  - [x] Implement `JsonApiUpdateRequest`
-    - Make `ResourceType`'s only method `get_type` static: `fn get_type() -> &'static str`
-    - Make `JsonApiUpdateRequest` generic on `InputData` so it can validate type of incomming request incomming request
+    - [x] Make `ResourceType`'s only method `get_type` static: `fn get_type() -> &'static str`
+    - Make `JsonApiUpdateRequest` generic on `InputData` so it can validate type of incomming request
  - Test `JsonApiUpdateRequest`
  - [x] Test `JsonApiDataResponse` as a `Responder`
  - [x] Make `JsonApiCreateResponse` with all the different types of responses allowed for creating data
@@ -82,6 +82,9 @@
  - [x] Make `JsonApiUpdateResponse` with all the different types of responses allowed for creating data
  - Test `JsonApiUpdateResponse`
  - Tests for `JsonApi`
+ - Rename `resource_identifier` module. Right now the name does not quite reflect its content.
+ - Carefully read about resource identifier objects. Can they be used as primary data? If so, should they be exposed as
+ public, and moved out of `core` module?
  - Probably a ton more, that I forgot...
  
 ## Documentation stuff

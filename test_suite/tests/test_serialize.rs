@@ -14,7 +14,7 @@ struct Test {
 }
 
 impl ResourceType for Test {
-    fn get_type(&self) -> &'static str {
+    fn get_type() -> &'static str {
         &"Test"
     }
 }

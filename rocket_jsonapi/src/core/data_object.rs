@@ -87,7 +87,7 @@ where
     {
         let mut state = serializer.serialize_struct("ResourceIdentifier", 3)?;
         state.serialize_field("id", &self.0.get_id().to_string())?;
-        state.serialize_field("type", self.0.get_type())?;
+        state.serialize_field("type", R::get_type())?;
         state.serialize_field("attributes", &self.0)?;
         state.end()
     }
@@ -105,7 +105,7 @@ where
         let mut state = serializer.serialize_struct("ResourceIdentifier", 3)?;
         // Specialized part, here we simply read the Id value, no conversion needed
         state.serialize_field("id", &self.0.get_id().as_str())?;
-        state.serialize_field("type", self.0.get_type())?;
+        state.serialize_field("type", Data::get_type())?;
         state.serialize_field("attributes", &self.0)?;
         state.end()
     }
@@ -128,7 +128,7 @@ mod tests {
     }
 
     impl ResourceType for Test {
-        fn get_type(&self) -> &'static str {
+        fn get_type() -> &'static str {
             &"Test"
         }
     }
@@ -170,7 +170,7 @@ mod tests {
             message: String,
         }
         impl ResourceType for T {
-            fn get_type(&self) -> &'static str {
+            fn get_type() -> &'static str {
                 &"T"
             }
         }

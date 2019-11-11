@@ -1,5 +1,6 @@
 use crate::lib::*;
 use crate::resource::ResourceType;
+use std::marker::PhantomData;
 
 /// Object to represent a "resource identifier object", which is an object that identifies an
 /// individual resource. [See specification](https://jsonapi
@@ -8,39 +9,48 @@ use crate::resource::ResourceType;
 /// They are returned when resources are linked, for example in relationships or included. [See
 /// resource linkage](https://jsonapi.org/format/#document-resource-object-linkage).
 #[derive(Serialize)]
-pub struct ResourceIdentifierObject {
+pub struct ResourceIdentifierObject<Data> {
     pub id: String,
     #[serde(rename = "type")]
     pub object_type: &'static str,
+    phantom: PhantomData<Data>,
 }
 
-impl ResourceIdentifierObject {
+impl<Data> ResourceIdentifierObject<Data> {
     /// Creates a resource identifier object from an object that can be serialized as a resource
     /// object.
     pub fn create_identifier<T: ResourceIdentifiable>(resource: &T) -> Self {
-        ResourceIdentifierObject {
+        ResourceIdentifierObject::<Data> {
             id: resource.get_id().to_string(),
-            object_type: resource.get_type(),
+            object_type: T::get_type(),
+            phantom: PhantomData,
         }
     }
 }
 
-impl<T: ResourceIdentifiable> From<&T> for ResourceIdentifierObject {
+impl<Data, T: ResourceIdentifiable> From<&T> for ResourceIdentifierObject<Data> {
     fn from(resource: &T) -> Self {
-        ResourceIdentifierObject {
+        ResourceIdentifierObject::<Data> {
             id: resource.get_id().to_string(),
-            object_type: resource.get_type(),
+            object_type: T::get_type(),
+            phantom: PhantomData,
         }
     }
 }
 
-impl ResourceType for ResourceIdentifierObject {
-    fn get_type(&self) -> &'static str {
-        self.object_type
+impl<Data> ResourceType for ResourceIdentifierObject<Data>
+where
+    Data: ResourceType,
+{
+    fn get_type() -> &'static str {
+        Data::get_type()
     }
 }
 
-impl ResourceIdentifiable for ResourceIdentifierObject {
+impl<Data> ResourceIdentifiable for ResourceIdentifierObject<Data>
+where
+    Data: ResourceType,
+{
     type IdType = String;
 
     fn get_id(&self) -> &String {
@@ -70,7 +80,7 @@ where
     {
         let mut state = serializer.serialize_struct("ResourceIdentifierObject", 3)?;
         state.serialize_field("id", &self.0.get_id().to_string())?;
-        state.serialize_field("type", self.0.get_type())?;
+        state.serialize_field("type", R::get_type())?;
         state.end()
     }
 }

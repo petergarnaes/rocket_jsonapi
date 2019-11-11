@@ -100,7 +100,7 @@ fn impl_resource_type(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream,
     // Defining inner macro for each expansion is ugly
     let gen = quote! {
         impl rocket_jsonapi::ResourceType for #name {
-            fn get_type(&self) -> &'static str {
+            fn get_type() -> &'static str {
                 &stringify!(#resource_ident_type)
             }
         }

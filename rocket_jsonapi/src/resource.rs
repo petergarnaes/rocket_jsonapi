@@ -2,7 +2,7 @@ use crate::lib::*;
 
 pub trait ResourceType {
     /// Returns the resource type
-    fn get_type(&self) -> &'static str;
+    fn get_type() -> &'static str;
 }
 
 pub trait ResourceIdentifiable: ResourceType {

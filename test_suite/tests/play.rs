@@ -25,7 +25,7 @@ struct Article {
 }
 
 impl ResourceType for Article {
-    fn get_type(&self) -> &'static str {
+    fn get_type() -> &'static str {
         &"article"
     }
 }
@@ -82,7 +82,7 @@ struct Person {
 }
 
 impl ResourceType for Person {
-    fn get_type(&self) -> &'static str {
+    fn get_type() -> &'static str {
         &"person"
     }
 }
@@ -105,8 +105,8 @@ impl Linkify for Person {
 struct Author(Person);
 
 impl ResourceType for Author {
-    fn get_type(&self) -> &'static str {
-        self.0.get_type()
+    fn get_type() -> &'static str {
+        Person::get_type()
     }
 }
 
@@ -127,8 +127,8 @@ impl Linkify for Author {
 struct ProofReader(Person);
 
 impl ResourceType for ProofReader {
-    fn get_type(&self) -> &'static str {
-        self.0.get_type()
+    fn get_type() -> &'static str {
+        Person::get_type()
     }
 }
 

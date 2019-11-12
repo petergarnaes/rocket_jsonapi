@@ -99,7 +99,6 @@ mod test_create_response {
     use rocket::http::Status;
     use rocket::local::Client;
     use rocket::request::FromFormValue;
-    use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
     use rocket_jsonapi::response::JsonApiCreateResponse;
     use serde::{Deserialize, Serialize};
     use serde_json::{from_str, json, Value};
@@ -316,4 +315,198 @@ mod test_create_response {
     }
 }
 
-mod test_header_update_response {}
+mod test_header_update_response {
+    use crate::Test;
+    use rocket::http::Status;
+    use rocket::local::Client;
+    use rocket::request::FromFormValue;
+    use rocket_jsonapi::response::JsonApiUpdateResponse;
+    use serde::{Deserialize, Serialize};
+    use serde_json::{from_str, json, Value};
+
+    #[derive(Serialize, Deserialize, FromFormValue)]
+    enum UpdateResponseTrigger {
+        Updated,
+        Accepted,
+        NoContent,
+        Forbidden,
+        NotFound,
+        InvalidUpdate,
+        Other,
+    }
+
+    #[get("/simple?<trigger>")]
+    fn simple(trigger: UpdateResponseTrigger) -> JsonApiUpdateResponse<Test> {
+        let test = Test {
+            id: 5,
+            message: String::from("Bob"),
+        };
+        match trigger {
+            UpdateResponseTrigger::Updated => JsonApiUpdateResponse::Updated(test),
+            UpdateResponseTrigger::Accepted => JsonApiUpdateResponse::Accepted(test),
+            UpdateResponseTrigger::NoContent => JsonApiUpdateResponse::NoContent,
+            UpdateResponseTrigger::Forbidden => JsonApiUpdateResponse::Forbidden(None),
+            UpdateResponseTrigger::NotFound => JsonApiUpdateResponse::NotFound(None),
+            UpdateResponseTrigger::InvalidUpdate => JsonApiUpdateResponse::InvalidUpdate(None),
+            UpdateResponseTrigger::Other => {
+                JsonApiUpdateResponse::Other(Status::BadGateway, Err(vec![]))
+            }
+        }
+    }
+
+    #[test]
+    fn rocket_update_response_updated() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple?trigger=Updated").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::Ok);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "data": {
+                "id": "5",
+                "type": "Test",
+                "attributes": {
+                    "id": 5,
+                    "message": "Bob"
+                }
+            }
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+
+    #[test]
+    fn rocket_update_response_accepted() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple?trigger=Accepted").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::Accepted);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "data": {
+                "id": "5",
+                "type": "Test",
+                "attributes": {
+                    "id": 5,
+                    "message": "Bob"
+                }
+            }
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+
+    #[test]
+    fn rocket_update_response_no_content() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple?trigger=NoContent").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::NoContent);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        assert!(response.body().is_none());
+    }
+
+    #[test]
+    fn rocket_update_response_forbidden() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple?trigger=Forbidden").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::Forbidden);
+        let headers = response.headers();
+        // Test header response
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "errors": []
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+
+    #[test]
+    fn rocket_update_response_not_found() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple?trigger=NotFound").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::NotFound);
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "errors": []
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+
+    #[test]
+    fn rocket_update_response_invalid_update() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple?trigger=InvalidUpdate").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::Conflict);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "errors": []
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+
+    #[test]
+    fn rocket_update_response_other() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple?trigger=Other").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::BadGateway);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "errors": []
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+}

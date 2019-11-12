@@ -41,7 +41,7 @@
  - [x] Write full-stack'ish serialization tests for `JsonApiDataResponse` with all sorts of implementations for the wrapped
   type.
  - [x] Move many of the tests of public APIs to `test_suite` crate
- - Test derive of `ResourceType`
+ - [x] Test derive of `ResourceType`
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included
  - Make `Relationships` derivable, consider its current API
  - Make the `Included` API, probably use same approach as relationships API
@@ -83,8 +83,8 @@
  - [x] Test `JsonApiDataResponse` as a `Responder`
  - [x] Make `JsonApiCreateResponse` with all the different types of responses allowed for creating data
     - [x] Test `JsonApiCreateResponse`
- - Make `JsonApiUpdateResponse` with all the different types of responses allowed for updating data
-    - Test `JsonApiUpdateResponse`
+ - [x] Make `JsonApiUpdateResponse` with all the different types of responses allowed for updating data
+    - [x] Test `JsonApiUpdateResponse`
  - Rename `resource_identifier` module. Right now the name does not quite reflect its content.
  - Move `ResourceObjectIdentifier` to the public API
     - Make a newtype `ToResourceObjectIdentifier` that serializes the inner type as a resource object identifier

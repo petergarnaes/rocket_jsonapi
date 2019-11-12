@@ -15,6 +15,17 @@ fn test_gen_linkify_simple() {
 }
 
 #[test]
+fn test_gen_resource_type_simple() {
+    #[derive(ResourceType)]
+    struct SimpleResource {
+        id: String,
+        bob: Box<String>,
+    }
+    assert_resource_type::<SimpleResource>();
+    assert_eq!("SimpleResource", SimpleResource::get_type());
+}
+
+#[test]
 fn test_gen_resource_identifiable_simple() {
     #[derive(ResourceType, ResourceIdentifiable)]
     struct SimpleResource {

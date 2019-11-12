@@ -235,3 +235,66 @@ where
         }
     }
 }
+
+pub enum JsonApiUpdateResponse<Data> {
+    /// Data is accepted and updated, [spec](https://jsonapi.org/format/#crud-updating-responses-200)
+    Updated(Data),
+    /// Used when data is accepted, but maybe needs asynchronous processing and is not created yet,
+    /// [spec](https://jsonapi.org/format/#crud-updating-responses-202)
+    Accepted(Data),
+    /// Used when responding as a 200 ok, but with no returned data.
+    /// [spec](https://jsonapi.org/format/#crud-updating-responses-204)
+    NoContent,
+    Forbidden(Option<Vec<JsonApiError>>),
+    NotFound(Option<Vec<JsonApiError>>),
+    // TODO what to name this case?
+    InvalidUpdate(Option<Vec<JsonApiError>>),
+    //Conflict(Option<Vec<JsonApiError>>),
+    /// Specification says you can respond with any status you want,
+    /// [spec](https://jsonapi.org/format/#crud-updating-responses-other)
+    Other(Status, Result<Data, Vec<JsonApiError>>),
+}
+
+impl<'r, Data> Responder<'r> for JsonApiUpdateResponse<Data>
+where
+    Data: Serialize + ResourceIdentifiable + Linkify,
+{
+    fn respond_to(self, request: &Request<'_>) -> Result<Response<'r>, Status> {
+        match self {
+            JsonApiUpdateResponse::Updated(data) => {
+                JsonApiResponse(Status::Ok, Ok(data)).respond_to(request)
+            }
+            JsonApiUpdateResponse::Accepted(data) => {
+                JsonApiResponse(Status::Accepted, Ok(data)).respond_to(request)
+            }
+            JsonApiUpdateResponse::NoContent => Ok(Response::build()
+                .header(ContentType::JsonApi)
+                .status(Status::NoContent)
+                .finalize()),
+            JsonApiUpdateResponse::Forbidden(error) => {
+                let err = match error {
+                    Some(errors) => errors,
+                    None => vec![],
+                };
+                JsonApiResponse::<Data>(Status::Forbidden, Err(err)).respond_to(request)
+            }
+            JsonApiUpdateResponse::NotFound(error) => {
+                let err = match error {
+                    Some(errors) => errors,
+                    None => vec![],
+                };
+                JsonApiResponse::<Data>(Status::NotFound, Err(err)).respond_to(request)
+            }
+            JsonApiUpdateResponse::InvalidUpdate(error) => {
+                let err = match error {
+                    Some(errors) => errors,
+                    None => vec![],
+                };
+                JsonApiResponse::<Data>(Status::Conflict, Err(err)).respond_to(request)
+            }
+            JsonApiUpdateResponse::Other(status, res) => {
+                JsonApiResponse(status, res).respond_to(request)
+            }
+        }
+    }
+}

@@ -72,17 +72,19 @@
  ` as [reference](https://github.com/SergioBenitez/Rocket/blob/master/contrib/lib/src/json.rs).
  - [x] Implement `JsonApiCreateRequest`
  - [x] Test `JsonApiCreateRequest`
-    - Test `JsonApiCreateRequest` validation of type of incomming request
+    - [x] Test `JsonApiCreateRequest` validation of type of incoming request, give 409 Conflict
+    - [x] Test `JsonApiCreateRequest` validation of input data missing fields give 409 Conflict
  - [x] Implement `JsonApiUpdateRequest`
     - [x] Make `ResourceType`'s only method `get_type` static: `fn get_type() -> &'static str`
-    - [x] Make `JsonApiUpdateRequest` generic on `InputData` so it can validate type of incomming request
+    - [x] Make `JsonApiUpdateRequest` generic on `InputData` so it can validate type of incoming request
  - [x] Test `JsonApiUpdateRequest`
-    - Test `JsonApiUpdateRequest` validation of type of incomming request
+    - [x] Test `JsonApiUpdateRequest` validation of type of incoming request give 409 Conflict
+    - [x] Test `JsonApiUpdateRequest` validation of missing id give 409 conflict
  - [x] Test `JsonApiDataResponse` as a `Responder`
  - [x] Make `JsonApiCreateResponse` with all the different types of responses allowed for creating data
- - Test `JsonApiCreateResponse`
+    - Test `JsonApiCreateResponse`
  - Make `JsonApiUpdateResponse` with all the different types of responses allowed for creating data
- - Test `JsonApiUpdateResponse`
+    - Test `JsonApiUpdateResponse`
  - Rename `resource_identifier` module. Right now the name does not quite reflect its content.
  - Move `ResourceObjectIdentifier` to the public API
     - Make a newtype `ToResourceObjectIdentifier` that serializes the inner type as a resource object identifier

@@ -8,6 +8,7 @@ use rocket::request::{self, FromRequest};
 use rocket::Data;
 use rocket::Request;
 use serde::export::PhantomData;
+use serde_json::error::Category;
 use serde_json::{Map, Value};
 
 pub struct JsonApiRequest;
@@ -79,6 +80,8 @@ where
     for<'de> InputData: ResourceType + Deserialize<'de>,
 {
     // TODO right error?
+    // A server SHOULD include error details and provide enough information to recognize the source
+    // of the conflict.
     type Error = ();
 
     fn from_data(request: &Request, data: Data) -> data::Outcome<Self, Self::Error> {
@@ -89,10 +92,13 @@ where
                     serde_json::from_reader(data.open());
                 match b {
                     Ok(result) => data::Outcome::Success(JsonApiCreateRequest(result.data.0)),
-                    Err(err) => {
-                        println!("Error: {}", err);
-                        data::Outcome::Failure((Status::BadRequest, ()))
-                    }
+                    Err(err) => match err.classify() {
+                        // A server MUST return 409 Conflict when processing a POST request in which
+                        // the resource object’s type is not among the type(s) that constitute the
+                        // collection represented by the endpoint.
+                        Category::Data => data::Outcome::Failure((Status::Conflict, ())),
+                        _ => data::Outcome::Failure((Status::BadRequest, ())),
+                    },
                 }
             }
             Err(status) => data::Outcome::Failure((status, ())),
@@ -105,6 +111,8 @@ where
     for<'de> InputData: ResourceType + Deserialize<'de>,
 {
     // TODO right error?
+    // A server SHOULD include error details and provide enough information to recognize the source
+    // of the conflict.
     type Error = ();
 
     fn from_data(request: &Request, data: Data) -> data::Outcome<Self, Self::Error> {
@@ -114,10 +122,9 @@ where
                 let b: Result<JsonApiUpdateResource, serde_json::error::Error> =
                     serde_json::from_reader(data.open());
                 match b {
-                    // TODO check resource_type for match?
                     Ok(result) => {
                         if result.data.resource_type != InputData::get_type() {
-                            return data::Outcome::Failure((Status::BadRequest, ()));
+                            return data::Outcome::Failure((Status::Conflict, ()));
                         }
                         data::Outcome::Success(JsonApiUpdateRequest::<InputData> {
                             id: result.data.id,
@@ -125,10 +132,13 @@ where
                             phantom: PhantomData,
                         })
                     }
-                    Err(err) => {
-                        println!("Error: {}", err);
-                        data::Outcome::Failure((Status::BadRequest, ()))
-                    }
+                    Err(err) => match err.classify() {
+                        // Specification: A server MUST return 409 Conflict when processing a PATCH
+                        // request in which the resource object’s type and id do not match the
+                        // server’s endpoint.
+                        Category::Data => data::Outcome::Failure((Status::Conflict, ())),
+                        _ => data::Outcome::Failure((Status::BadRequest, ())),
+                    },
                 }
             }
             Err(status) => data::Outcome::Failure((status, ())),

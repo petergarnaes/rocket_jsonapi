@@ -168,17 +168,20 @@ where
 }
 
 pub enum JsonApiCreateResponse<Data> {
-    /// Data is accepted and created
+    /// Data is accepted and created, [spec](https://jsonapi.org/format/#crud-creating-responses-201)
     Created(Data),
-    /// Used when data is accepted, but maybe needs asynchronous processing and is not created yet
+    /// Used when data is accepted, but maybe needs asynchronous processing and is not created yet,
+    /// [spec](https://jsonapi.org/format/#crud-creating-responses-202)
     Accepted(Data),
     /// Used when responding as a 201 create, but with no returned data.
+    /// [spec](https://jsonapi.org/format/#crud-creating-responses-204)
     NoContent,
     UnsupportedClientId(Option<Vec<JsonApiError>>),
     Forbidden(Option<Vec<JsonApiError>>),
     NotFound(Option<Vec<JsonApiError>>),
     AlreadyExists(Option<Vec<JsonApiError>>),
-    /// Specification says you can respond with any status you want
+    /// Specification says you can respond with any status you want,
+    /// [spec](https://jsonapi.org/format/#crud-creating-responses-other)
     Other(Status, Result<Data, Vec<JsonApiError>>),
 }
 

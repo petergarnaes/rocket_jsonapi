@@ -329,7 +329,7 @@ mod test_request_input {
     use crate::Test;
     use rocket::http::{Header, Status};
     use rocket::local::Client;
-    use rocket_jsonapi::request::{JsonApiCreateRequest, JsonApiRequest, JsonApiUpdateRequest};
+    use rocket_jsonapi::request::{JsonApiCreateRequest, JsonApiUpdateRequest};
     use rocket_jsonapi::response::JsonApiDataResponse;
 
     #[post("/simple_data", data = "<input>")]
@@ -365,7 +365,7 @@ mod test_request_input {
         }
         "#,
         );
-        let mut response = request.dispatch();
+        let response = request.dispatch();
         // Test HTTP status code
         assert_eq!(response.status(), Status::Conflict);
     }
@@ -389,7 +389,7 @@ mod test_request_input {
         }
         "#,
         );
-        let mut response = request.dispatch();
+        let response = request.dispatch();
         // Test HTTP status code
         assert_eq!(response.status(), Status::Conflict);
     }

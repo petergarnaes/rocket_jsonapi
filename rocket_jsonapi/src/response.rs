@@ -195,7 +195,7 @@ where
                 JsonApiResponse(Status::Created, Ok(data)).respond_to(request)
             }
             JsonApiCreateResponse::Accepted(data) => {
-                JsonApiResponse(Status::Created, Ok(data)).respond_to(request)
+                JsonApiResponse(Status::Accepted, Ok(data)).respond_to(request)
             }
             JsonApiCreateResponse::NoContent => Ok(Response::build()
                 .header(ContentType::JsonApi)
@@ -220,14 +220,14 @@ where
                     Some(errors) => errors,
                     None => vec![],
                 };
-                JsonApiResponse::<Data>(Status::Forbidden, Err(err)).respond_to(request)
+                JsonApiResponse::<Data>(Status::NotFound, Err(err)).respond_to(request)
             }
             JsonApiCreateResponse::AlreadyExists(error) => {
                 let err = match error {
                     Some(errors) => errors,
                     None => vec![],
                 };
-                JsonApiResponse::<Data>(Status::Forbidden, Err(err)).respond_to(request)
+                JsonApiResponse::<Data>(Status::Conflict, Err(err)).respond_to(request)
             }
             JsonApiCreateResponse::Other(status, res) => {
                 JsonApiResponse(status, res).respond_to(request)

@@ -82,8 +82,8 @@
     - [x] Test `JsonApiUpdateRequest` validation of missing id give 409 conflict
  - [x] Test `JsonApiDataResponse` as a `Responder`
  - [x] Make `JsonApiCreateResponse` with all the different types of responses allowed for creating data
-    - Test `JsonApiCreateResponse`
- - Make `JsonApiUpdateResponse` with all the different types of responses allowed for creating data
+    - [x] Test `JsonApiCreateResponse`
+ - Make `JsonApiUpdateResponse` with all the different types of responses allowed for updating data
     - Test `JsonApiUpdateResponse`
  - Rename `resource_identifier` module. Right now the name does not quite reflect its content.
  - Move `ResourceObjectIdentifier` to the public API

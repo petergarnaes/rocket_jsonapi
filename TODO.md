@@ -7,7 +7,6 @@
 
 ## API stuff
 
- - [x] Overhaul module structure, it is getting messy in `response.rs` and `data.rs`, new modules probably needed
  - [x] Handle top level `errors` parsing properly, should be able to handle multiple errors and parse the top level key
   `errros`
     - [x] Make error representation
@@ -29,20 +28,30 @@
     - Implement `source` field for `JsonApiError`
     - Implement `links` field for `JsonApiError`
     - Implement `meta` field for `JsonApiError`
- - [x] Disable unused warnings in `test_suite` crate.
- - [x] Remove `DataObject` and any other types that are constructed when serializing, we don't want the overhead!
- - [x] Fix deriving of `ResourceIdentifiable`! Should be able to handle `IdType` now.
  - [x] Deriving `ResourceIdentifiable` should handle when `IdType=&str`, can copying be avoided?
  - [x] Write serialization tests of all the newtypes: `ResourceIdentifiableWrapper`, `JsonApiPrimaryDataObject` and
   `JsonApiPrimaryDataObjectArray`
- - [x] Hide `ResourceIdentifier` from user, move to core
  - [x] Make `ResourceIdentifierWrapper` with serialization implementation, so when constructing resource identifiers, we
   can simply read the objects we convert, instead of constructing new.
  - [x] Write full-stack'ish serialization tests for `JsonApiDataResponse` with all sorts of implementations for the wrapped
   type.
- - [x] Move many of the tests of public APIs to `test_suite` crate
  - [x] Test derive of `ResourceType`
+ - Consider `Linkify` API
+ - Integrate `Linkify` with `JsonApiResponse` so it comes out in the output
+    - Make fullstack Rocket tests to see output looks correct
+ - Integrate `Linkify` with `JsonApiCreateResponse` so it comes out in the output
+    - Make fullstack Rocket tests to see output looks correct
+ - Integrate `Linkify` with `JsonApiUpdateResponse` so it comes out in the output
+    - Make fullstack Rocket tests to see output looks correct
  - Expand `Linkify` derivable API, so static links, relationships etc. can be included
+ - Integrate `Relationships` with `JsonApiResponse` so it comes out in the output
+    - Integrate support for `data` attribute
+    - Make fullstack Rocket tests to see output looks correct
+    - Integrate support for `links` attribute
+ - Integrate `Relationships` with `JsonApiCreateResponse` so it comes out in the output
+    - Make fullstack Rocket tests to see output looks correct
+ - Integrate `Relationships` with `JsonApiUpdateResponse` so it comes out in the output
+    - Make fullstack Rocket tests to see output looks correct
  - Make `Relationships` derivable, consider its current API
  - Make the `Included` API, probably use same approach as relationships API
  - Make all our traits derivable with newtypes, so inheritance boilerplate can be reduced. This pattern could make
@@ -89,6 +98,7 @@
  - Move `ResourceObjectIdentifier` to the public API
     - Make a newtype `ToResourceObjectIdentifier` that serializes the inner type as a resource object identifier
  - Change `derive` of `ResourceType` to always use `#[inline]`
+ - Solve TODOs spread around the project
  - Probably a ton more, that I forgot...
  
 ## Documentation stuff

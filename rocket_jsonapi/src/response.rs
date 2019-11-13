@@ -58,7 +58,7 @@ use rocket::{Request, Response};
 ///
 /// Which outputs:
 ///
-/// ```ignore
+/// ```text
 /// Status code: 200, Content-Type: application/vnd.api+json
 /// ---
 /// {
@@ -109,7 +109,7 @@ use rocket::{Request, Response};
 ///
 /// Which outputs:
 ///
-/// ```ignore
+/// ```text
 /// Status code: 400, Content-Type: application/vnd.api+json
 /// ---
 /// {

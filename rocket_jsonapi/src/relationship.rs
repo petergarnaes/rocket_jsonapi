@@ -43,42 +43,45 @@ pub struct RelationObject {
     links: String,
 }
 
-pub trait RelationObjectify<To>: HaveRelationship<To> {
-    fn get_relation_object(&self) -> RelationObject;
+pub trait RelationObjectify<'a, To>: HaveRelationship<'a, To> {
+    fn get_relation_object(&'a self) -> RelationObject;
 }
 
-pub trait HaveRelationship<To> {
-    fn get_relation(&self) -> To;
+pub trait HaveRelationship<'a, To> {
+    fn get_relation(&'a self) -> To;
 }
 
 pub trait AllRelationships {
     fn get_all_relation_objects(&self) -> Vec<RelationObject>;
 }
 
-trait RelationObjectifyMeta<Meta, To>: RelationObjectify<To> {
+trait RelationObjectifyMeta<'a, Meta, To>: RelationObjectify<'a, To> {
     fn get_meta() -> Meta;
 }
 
-impl<From, To> RelationObjectify<To> for From
+impl<'a, From, To> RelationObjectify<'a, To> for From
 where
     To: ResourceIdentifiable + Linkify,
-    From: HaveRelationship<To>,
+    From: HaveRelationship<'a, To>,
 {
-    default fn get_relation_object(&self) -> RelationObject {
+    default fn get_relation_object(&'a self) -> RelationObject {
         let rel = self.get_relation();
         RelationObject {
-            data: vec![(&rel).into()],
+            data: vec![ResIdenObjNonGeneric {
+                id: rel.get_id().to_string(),
+                object_type: To::get_type(),
+            }],
             links: "".to_owned(),
         }
     }
 }
 
-impl<From, To> RelationObjectify<Vec<To>> for From
+impl<'a, From, To> RelationObjectify<'a, Vec<To>> for From
 where
     To: ResourceIdentifiable + Linkify,
-    From: HaveRelationship<Vec<To>>,
+    From: HaveRelationship<'a, Vec<To>>,
 {
-    fn get_relation_object(&self) -> RelationObject {
+    fn get_relation_object(&'a self) -> RelationObject {
         let rel = self.get_relation();
         RelationObject {
             data: rel.iter().map(|to| to.into()).collect(),

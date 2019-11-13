@@ -1,3 +1,4 @@
+use crate::core::links_serialize::LinksSerialize;
 use crate::core::serialize_no_conversion::CanSerializeNoConversion;
 use crate::lib::*;
 
@@ -15,13 +16,8 @@ where
         let mut state = serializer.serialize_struct("JsonApiPrimaryDataObject", 3)?;
         state.serialize_field("data", &ResourceIdentifiableWrapper(self.0))?;
         let links = Data::get_links();
-        match links.len() {
-            0 => {
-                // TODO do not parse the links field
-            }
-            _ => {
-                // TODO parse each element as a nested object in parent links object, use provided key
-            }
+        if !links.is_empty() {
+            state.serialize_field("links", &LinksSerialize(links))?;
         }
         // TODO Includify and Relationships
         state.end()
@@ -39,13 +35,8 @@ where
         let mut state = serializer.serialize_struct("JsonApiPrimaryDataObject", 3)?;
         state.serialize_field("data", &JsonApiPrimaryDataObjectArray(self.0))?;
         let links = Data::get_links();
-        match links.len() {
-            0 => {
-                // TODO do not parse the links field
-            }
-            _ => {
-                // TODO parse each element as a nested object in parent links object, use provided key
-            }
+        if !links.is_empty() {
+            state.serialize_field("links", &LinksSerialize(links))?;
         }
         // TODO Includify and Relationships
         state.end()

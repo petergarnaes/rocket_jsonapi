@@ -2,7 +2,7 @@
 use crate::lib::*;
 use erased_serde::Serialize as RefSerialize;
 
-type Key = String;
+type Key = &'static str;
 type Url = String;
 
 #[derive(Serialize)]
@@ -17,7 +17,7 @@ impl LinkObject {
     }
 }
 
-pub enum LinksObject {
+pub enum Link {
     Url(Key, Url),
     Object(Key, LinkObject),
 }
@@ -25,7 +25,7 @@ pub enum LinksObject {
 // TODO derive version? Maybe for the simple URL case
 // TODO make return type an Option? Or own enum?
 pub trait Linkify {
-    fn get_links() -> Vec<LinksObject> {
+    fn get_links() -> Vec<Link> {
         vec![]
     }
 }

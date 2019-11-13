@@ -25,7 +25,7 @@ fn impl_linkify(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, Error
     let name = &ast.ident;
     Ok(quote! {
         impl rocket_jsonapi::links::Linkify for #name {
-            fn get_links() -> Vec<rocket_jsonapi::links::LinksObject> {
+            fn get_links() -> Vec<rocket_jsonapi::links::Link> {
                 vec![]
             }
         }

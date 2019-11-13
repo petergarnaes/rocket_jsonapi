@@ -36,9 +36,9 @@
  - [x] Write full-stack'ish serialization tests for `JsonApiDataResponse` with all sorts of implementations for the wrapped
   type.
  - [x] Test derive of `ResourceType`
- - Consider `Linkify` API
- - Integrate `Linkify` with `JsonApiResponse` so it comes out in the output
-    - Make fullstack Rocket tests to see output looks correct
+ - [x] Consider `Linkify` API
+ - [x] Integrate `Linkify` with `JsonApiResponse` so it comes out in the output
+    - [x] Make fullstack Rocket tests to see output looks correct
  - Integrate `Linkify` with `JsonApiCreateResponse` so it comes out in the output
     - Make fullstack Rocket tests to see output looks correct
  - Integrate `Linkify` with `JsonApiUpdateResponse` so it comes out in the output

@@ -94,6 +94,92 @@ mod test_output_data_response {
     }
 }
 
+mod test_output_data_response_links {
+    use rocket::http::Status;
+    use rocket::local::Client;
+    use rocket_jsonapi::links::{Link, LinkObject};
+    use rocket_jsonapi::response::JsonApiDataResponse;
+    use rocket_jsonapi::{Linkify, ResourceIdentifiable, ResourceType};
+    use serde::Serialize;
+    use serde_json::{from_str, json, Value};
+
+    #[derive(Serialize, ResourceType, ResourceIdentifiable)]
+    struct TestWithLinks {
+        id: u64,
+        message: String,
+    }
+
+    #[derive(Serialize)]
+    struct Meta {
+        stuff: String,
+    }
+
+    impl Linkify for TestWithLinks {
+        fn get_links() -> Vec<Link> {
+            vec![
+                Link::Url(
+                    "self",
+                    String::from("http://fake.com/api/test_with_links/1"),
+                ),
+                Link::Object(
+                    "something",
+                    LinkObject {
+                        href: String::from("http://fake.com/api/test_with_links/1/something"),
+                        meta: Box::new(Meta {
+                            stuff: String::from("stuff"),
+                        }),
+                    },
+                ),
+            ]
+        }
+    }
+
+    #[get("/simple_links")]
+    fn simple() -> JsonApiDataResponse<TestWithLinks> {
+        JsonApiDataResponse(Ok(TestWithLinks {
+            id: 1,
+            message: String::from("Hello!"),
+        }))
+    }
+
+    #[test]
+    fn rocket_simple_ok_response() {
+        let rocket = rocket::ignite().mount("/", routes![simple]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple_links").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::Ok);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "data": {
+                "id": "1",
+                "type": "TestWithLinks",
+                "attributes": {
+                    "id": 1,
+                    "message": "Hello!"
+                }
+            },
+            "links": {
+                "self": "http://fake.com/api/test_with_links/1",
+                "something": {
+                    "href": "http://fake.com/api/test_with_links/1/something",
+                    "meta": {
+                        "stuff": "stuff"
+                    }
+                }
+            }
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+}
+
 mod test_create_response {
     use crate::Test;
     use rocket::http::Status;

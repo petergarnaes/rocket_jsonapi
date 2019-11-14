@@ -30,6 +30,20 @@ mod test_output_data_response {
         }))
     }
 
+    #[get("/simple_list")]
+    fn simple_list() -> JsonApiDataResponse<Vec<Test>> {
+        JsonApiDataResponse(Ok(vec![
+            Test {
+                id: 1,
+                message: String::from("Hello!"),
+            },
+            Test {
+                id: 2,
+                message: String::from("Hay!"),
+            },
+        ]))
+    }
+
     #[get("/simple_error")]
     fn simple_error() -> JsonApiDataResponse<Test> {
         JsonApiDataResponse(Err(JsonApiResponseError::new(
@@ -65,6 +79,41 @@ mod test_output_data_response {
                     "message": "Hello!"
                 }
             }
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+
+    #[test]
+    fn rocket_simple_ok_list_response() {
+        let rocket = rocket::ignite().mount("/", routes![simple_list]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple_list").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::Ok);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "data": [{
+                "id": "1",
+                "type": "Test",
+                "attributes": {
+                    "id": 1,
+                    "message": "Hello!"
+                }
+            }, {
+                "id": "2",
+                "type": "Test",
+                "attributes": {
+                    "id": 2,
+                    "message": "Hay!"
+                }
+            }]
         });
         assert_eq!(requested_json, expected_json);
     }

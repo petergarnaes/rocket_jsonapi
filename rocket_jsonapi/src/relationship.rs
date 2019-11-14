@@ -51,7 +51,7 @@ pub trait HaveRelationship<'a, To> {
     fn get_relation(&'a self) -> To;
 }
 
-pub trait AllRelationships {
+pub trait Relationships {
     fn get_all_relation_objects(&self) -> Vec<RelationObject>;
 }
 

@@ -2,7 +2,7 @@
 use rocket_jsonapi::links::Link::Object;
 use rocket_jsonapi::links::{Link, LinkObject, Linkify};
 use rocket_jsonapi::relationship::{
-    AllRelationships, HaveRelationship, RelationObject, RelationObjectify,
+    HaveRelationship, RelationObject, RelationObjectify, Relationships,
 };
 use rocket_jsonapi::resource::ResourceType;
 use rocket_jsonapi::ResourceIdentifiable;
@@ -64,7 +64,7 @@ impl<'a> HaveRelationship<'a, &'a ProofReader> for Article {
 
 /*
 */
-impl AllRelationships for Article {
+impl Relationships for Article {
     fn get_all_relation_objects(&self) -> Vec<RelationObject> {
         vec![
             <dyn RelationObjectify<Author>>::get_relation_object(self),

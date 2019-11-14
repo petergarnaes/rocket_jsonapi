@@ -121,48 +121,31 @@ use rocket::{Request, Response};
 /// ```
 pub struct JsonApiDataResponse<Data>(pub Result<Data, JsonApiResponseError>);
 
-impl<Data> Serialize for JsonApiDataResponse<Data>
-where
-    // TODO implement Includify + AllRelationships
-    Data: Serialize + ResourceIdentifiable + Linkify,
-{
-    default fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match &self.0 {
-            Ok(api_result) => serializer.serialize_some(&JsonApiPrimaryDataObject(api_result)),
-            Err(err) => serializer.serialize_some(&err),
-        }
-        // TODO handle json_api field
-    }
-}
-
-impl<Data> Serialize for JsonApiDataResponse<Vec<Data>>
-where
-    // TODO implement Includify + AllRelationships
-    Data: Serialize + ResourceIdentifiable + Linkify,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match &self.0 {
-            Ok(api_result) => serializer.serialize_some(&JsonApiPrimaryDataObject(api_result)),
-            Err(err) => serializer.serialize_some(&err),
-        }
-        // TODO handle json_api field
-    }
-}
-
 impl<'r, Data> Responder<'r> for JsonApiDataResponse<Data>
 where
     Data: Serialize + ResourceIdentifiable + Linkify,
 {
+    default fn respond_to(self, request: &Request<'_>) -> Result<Response<'r>, Status> {
+        let general_response: JsonApiResponse<Data> = self.into();
+        general_response.respond_to(request)
+    }
+}
+
+impl<'r, Data> Responder<'r> for JsonApiDataResponse<Vec<Data>>
+where
+    Data: Serialize + ResourceIdentifiable + Linkify,
+{
     fn respond_to(self, request: &Request<'_>) -> Result<Response<'r>, Status> {
-        match self.0 {
-            Ok(data) => JsonApiResponse(Status::Ok, Ok(data)).respond_to(request),
-            Err(error) => JsonApiResponse::<Data>(error.0, Err(error.1)).respond_to(request),
+        let general_response: JsonApiResponse<Vec<Data>> = self.into();
+        general_response.respond_to(request)
+    }
+}
+
+impl<Data> From<JsonApiDataResponse<Data>> for JsonApiResponse<Data> {
+    fn from(data_response: JsonApiDataResponse<Data>) -> Self {
+        match data_response.0 {
+            Ok(data) => JsonApiResponse(Status::Ok, Ok(data)),
+            Err(err) => JsonApiResponse::<Data>(err.0, Err(err.1)),
         }
     }
 }

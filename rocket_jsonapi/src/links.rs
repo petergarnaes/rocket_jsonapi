@@ -25,7 +25,7 @@ pub enum Link {
 // TODO derive version? Maybe for the simple URL case
 // TODO make return type an Option? Or own enum?
 pub trait Linkify {
-    fn get_links() -> Vec<Link> {
+    fn get_links(&self) -> Vec<Link> {
         vec![]
     }
 }

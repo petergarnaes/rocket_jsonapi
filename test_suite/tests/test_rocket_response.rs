@@ -19,7 +19,7 @@ mod test_output_data_response {
     use rocket::local::Client;
     use rocket_jsonapi::error::{JsonApiError, JsonApiResponseError};
     use rocket_jsonapi::json_api_error;
-    use rocket_jsonapi::response::JsonApiDataResponse;
+    use rocket_jsonapi::response::{JsonApiCollection, JsonApiDataResponse};
     use serde_json::{from_str, json, Value};
 
     #[get("/simple")]
@@ -31,8 +31,8 @@ mod test_output_data_response {
     }
 
     #[get("/simple_list")]
-    fn simple_list() -> JsonApiDataResponse<Vec<Test>> {
-        JsonApiDataResponse(Ok(vec![
+    fn simple_list() -> JsonApiDataResponse<JsonApiCollection<Test>> {
+        JsonApiDataResponse(Ok(JsonApiCollection::data(vec![
             Test {
                 id: 1,
                 message: String::from("Hello!"),
@@ -41,7 +41,7 @@ mod test_output_data_response {
                 id: 2,
                 message: String::from("Hay!"),
             },
-        ]))
+        ])))
     }
 
     #[get("/simple_error")]
@@ -97,7 +97,8 @@ mod test_output_data_response {
             "application/vnd.api+json"
         );
         // Test body response
-        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let requested_json: serde_json::Result<Value> =
+            from_str(response.body_string().unwrap().as_str());
         let expected_json = json!({
             "data": [{
                 "id": "1",
@@ -115,7 +116,7 @@ mod test_output_data_response {
                 }
             }]
         });
-        assert_eq!(requested_json, expected_json);
+        assert_eq!(requested_json.unwrap(), expected_json);
     }
 
     #[test]
@@ -147,7 +148,7 @@ mod test_output_data_response_links {
     use rocket::http::Status;
     use rocket::local::Client;
     use rocket_jsonapi::links::{Link, LinkObject};
-    use rocket_jsonapi::response::JsonApiDataResponse;
+    use rocket_jsonapi::response::{JsonApiCollection, JsonApiDataResponse};
     use rocket_jsonapi::{Linkify, ResourceIdentifiable, ResourceType};
     use serde::Serialize;
     use serde_json::{from_str, json, Value};
@@ -164,7 +165,7 @@ mod test_output_data_response_links {
     }
 
     impl Linkify for TestWithLinks {
-        fn get_links() -> Vec<Link> {
+        fn get_links(&self) -> Vec<Link> {
             vec![
                 Link::Url(
                     "self",
@@ -191,8 +192,22 @@ mod test_output_data_response_links {
         }))
     }
 
+    #[get("/simple_links")]
+    fn simple_list() -> JsonApiDataResponse<JsonApiCollection<TestWithLinks>> {
+        JsonApiDataResponse(Ok(JsonApiCollection::data_w_links(
+            vec![Link::Url(
+                "self",
+                String::from("http://fake.com/api/test_with_links"),
+            )],
+            vec![TestWithLinks {
+                id: 1,
+                message: String::from("Hello!"),
+            }],
+        )))
+    }
+
     #[test]
-    fn rocket_simple_ok_response() {
+    fn rocket_simple_ok_list_response() {
         let rocket = rocket::ignite().mount("/", routes![simple]);
         let client = Client::new(rocket).expect("valid rocket instance");
         let mut response = client.get("/simple_links").dispatch();
@@ -223,6 +238,37 @@ mod test_output_data_response_links {
                         "stuff": "stuff"
                     }
                 }
+            }
+        });
+        assert_eq!(requested_json, expected_json);
+    }
+
+    #[test]
+    fn rocket_simple_ok_response() {
+        let rocket = rocket::ignite().mount("/", routes![simple_list]);
+        let client = Client::new(rocket).expect("valid rocket instance");
+        let mut response = client.get("/simple_links").dispatch();
+        // Test HTTP status code
+        assert_eq!(response.status(), Status::Ok);
+        // Test header response
+        let headers = response.headers();
+        assert_eq!(
+            headers.get_one("Content-Type").unwrap(),
+            "application/vnd.api+json"
+        );
+        // Test body response
+        let requested_json: Value = from_str(response.body_string().unwrap().as_str()).unwrap();
+        let expected_json = json!({
+            "data": [{
+                "id": "1",
+                "type": "TestWithLinks",
+                "attributes": {
+                    "id": 1,
+                    "message": "Hello!"
+                }
+            }],
+            "links": {
+                "self": "http://fake.com/api/test_with_links"
             }
         });
         assert_eq!(requested_json, expected_json);

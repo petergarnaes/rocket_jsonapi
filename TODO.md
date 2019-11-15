@@ -98,6 +98,12 @@
  - Move `ResourceObjectIdentifier` to the public API
     - Make a newtype `ToResourceObjectIdentifier` that serializes the inner type as a resource object identifier
  - Change `derive` of `ResourceType` to always use `#[inline]`
+ - `JsonApiCollection` macro like `vec!`
+ - Delete request/response
+ - Sparse fieldsets, seems like it is non-optional
+ - Pagination
+ - Sorting, is optional for user, maybe just some help parsing it?
+ - Filtering, describe in guide book how and why it is up to the user to implement
  - Solve TODOs spread around the project
  - Probably a ton more, that I forgot...
  

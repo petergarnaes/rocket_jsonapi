@@ -11,6 +11,17 @@ use rocket::http::{ContentType, Status};
 use rocket::response::Responder;
 use rocket::{Request, Response};
 
+pub struct JsonApiCollection<Data>(pub Vec<Data>, pub Vec<Link>);
+
+impl<Data> JsonApiCollection<Data> {
+    pub fn data(vec: Vec<Data>) -> Self {
+        JsonApiCollection(vec, vec![])
+    }
+    pub fn data_w_links(links: Vec<Link>, vec: Vec<Data>) -> Self {
+        JsonApiCollection(vec, links)
+    }
+}
+
 /// # JSON:API Responder
 ///
 /// Responder for Rocket.rs route that responds with a JSON:API response. This object
@@ -131,12 +142,12 @@ where
     }
 }
 
-impl<'r, Data> Responder<'r> for JsonApiDataResponse<Vec<Data>>
+impl<'r, Data> Responder<'r> for JsonApiDataResponse<JsonApiCollection<Data>>
 where
     Data: Serialize + ResourceIdentifiable + Linkify,
 {
     fn respond_to(self, request: &Request<'_>) -> Result<Response<'r>, Status> {
-        let general_response: JsonApiResponse<Vec<Data>> = self.into();
+        let general_response: JsonApiResponse<JsonApiCollection<Data>> = self.into();
         general_response.respond_to(request)
     }
 }

@@ -1,6 +1,7 @@
 use crate::core::links_serialize::LinksSerialize;
 use crate::core::serialize_no_conversion::CanSerializeNoConversion;
 use crate::lib::*;
+use crate::response::JsonApiCollection;
 
 // Struct for data, will be parsed correctly
 pub struct JsonApiPrimaryDataObject<'a, Data>(pub &'a Data);
@@ -15,16 +16,16 @@ where
     {
         let mut state = serializer.serialize_struct("JsonApiPrimaryDataObject", 3)?;
         state.serialize_field("data", &ResourceIdentifiableWrapper(self.0))?;
-        let links = Data::get_links();
+        let links = self.0.get_links();
         if !links.is_empty() {
-            state.serialize_field("links", &LinksSerialize(links))?;
+            state.serialize_field("links", &LinksSerialize(&links))?;
         }
         // TODO Includify and Relationships
         state.end()
     }
 }
 
-impl<'a, Data> Serialize for JsonApiPrimaryDataObject<'a, Vec<Data>>
+impl<'a, Data> Serialize for JsonApiPrimaryDataObject<'a, JsonApiCollection<Data>>
 where
     Data: Serialize + ResourceIdentifiable + Linkify,
 {
@@ -33,8 +34,8 @@ where
         S: Serializer,
     {
         let mut state = serializer.serialize_struct("JsonApiPrimaryDataObject", 3)?;
-        state.serialize_field("data", &JsonApiPrimaryDataObjectArray(self.0))?;
-        let links = Data::get_links();
+        state.serialize_field("data", &JsonApiPrimaryDataObjectArray(&(self.0).0))?;
+        let links = &(self.0).1;
         if !links.is_empty() {
             state.serialize_field("links", &LinksSerialize(links))?;
         }
@@ -108,6 +109,7 @@ mod tests {
         JsonApiPrimaryDataObject, JsonApiPrimaryDataObjectArray, ResourceIdentifiableWrapper,
     };
     use crate::resource::ResourceType;
+    use crate::response::JsonApiCollection;
     use crate::{Linkify, ResourceIdentifiable};
     use serde::Serialize;
     use serde_json::json;
@@ -220,11 +222,12 @@ mod tests {
             id: 6,
             message: "Hallo".to_string(),
         };
-        let test_instance_value = serde_json::to_value(JsonApiPrimaryDataObject(&vec![
-            test_instance1,
-            test_instance2,
-        ]))
-        .unwrap();
+        let test_instance_value =
+            serde_json::to_value(JsonApiPrimaryDataObject(&JsonApiCollection::data(vec![
+                test_instance1,
+                test_instance2,
+            ])))
+            .unwrap();
         let test_equals_value = json!({
             "data": [{
                 "id": "5",

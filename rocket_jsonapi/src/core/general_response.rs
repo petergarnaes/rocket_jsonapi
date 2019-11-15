@@ -2,6 +2,7 @@ use crate::core::data_object::JsonApiPrimaryDataObject;
 use crate::error::JsonApiError;
 use crate::lib::*;
 use crate::relationship::Relationships;
+use crate::response::JsonApiCollection;
 use rocket::http::{ContentType, Status};
 use rocket::response::Responder;
 use rocket::{Request, Response};
@@ -40,7 +41,7 @@ where
     }
 }
 
-impl<Data> Serialize for JsonApiResponse<Vec<Data>>
+impl<Data> Serialize for JsonApiResponse<JsonApiCollection<Data>>
 where
     // TODO implement Includify + Relationships
     Data: Serialize + ResourceIdentifiable + Linkify,
@@ -94,7 +95,7 @@ where
     }
 }
 
-impl<'r, Data> Responder<'r> for JsonApiResponse<Vec<Data>>
+impl<'r, Data> Responder<'r> for JsonApiResponse<JsonApiCollection<Data>>
 where
     Data: Serialize + ResourceIdentifiable + Linkify,
 {
@@ -112,6 +113,7 @@ mod test_serialize {
     // Test that the various parts serialize properly
     use crate::core::general_response::JsonApiResponse;
     use crate::error::{JsonApiError, JsonApiResponseError};
+    use crate::response::JsonApiCollection;
     use crate::{json_api_error, Linkify, ResourceIdentifiable, ResourceType};
     use rocket::http::Status;
     use serde::Serialize;
@@ -170,9 +172,12 @@ mod test_serialize {
             id: 6,
             message: "World".to_string(),
         };
-        let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(
+        let test_instance_value = serde_json::to_value(JsonApiResponse::<JsonApiCollection<Test>>(
             Status::Ok,
-            Ok(vec![test_instance1, test_instance2]),
+            Ok(JsonApiCollection::data(vec![
+                test_instance1,
+                test_instance2,
+            ])),
         ))
         .unwrap();
         let test_equals_value = json!({
@@ -205,7 +210,7 @@ mod test_serialize {
             title = String::from("Medium error"),
             code = String::from("17")
         );
-        let test_instance_value = serde_json::to_value(JsonApiResponse::<Vec<Test>>(
+        let test_instance_value = serde_json::to_value(JsonApiResponse::<JsonApiCollection<Test>>(
             Status::Forbidden,
             Err(vec![test_error1, test_error2]),
         ))

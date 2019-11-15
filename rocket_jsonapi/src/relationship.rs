@@ -1,6 +1,7 @@
 //! # Responding with relationship metadata
 use crate::core::resource_identifier::ResourceIdentifierObject;
 use crate::lib::*;
+use crate::response::JsonApiCollection;
 
 //pub type Relationship = Box<dyn ResourceIdentifiable>;
 //pub type Relationships = Vec<Relationship>;
@@ -40,7 +41,7 @@ where
 
 pub struct RelationObject {
     data: Vec<ResIdenObjNonGeneric>,
-    links: String,
+    links: Vec<Link>,
 }
 
 pub trait RelationObjectify<'a, To>: HaveRelationship<'a, To> {
@@ -71,21 +72,21 @@ where
                 id: rel.get_id().to_string(),
                 object_type: To::get_type(),
             }],
-            links: "".to_owned(),
+            links: rel.get_links(),
         }
     }
 }
 
-impl<'a, From, To> RelationObjectify<'a, Vec<To>> for From
+impl<'a, From, To> RelationObjectify<'a, JsonApiCollection<To>> for From
 where
     To: ResourceIdentifiable + Linkify,
-    From: HaveRelationship<'a, Vec<To>>,
+    From: HaveRelationship<'a, JsonApiCollection<To>>,
 {
     fn get_relation_object(&'a self) -> RelationObject {
         let rel = self.get_relation();
         RelationObject {
-            data: rel.iter().map(|to| to.into()).collect(),
-            links: "".to_owned(),
+            data: rel.0.iter().map(|to| to.into()).collect(),
+            links: rel.1,
         }
     }
 }

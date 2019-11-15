@@ -42,7 +42,7 @@ impl ResourceIdentifiable for Article {
 }
 
 impl Linkify for Article {
-    fn get_links() -> Vec<Link> {
+    fn get_links(&self) -> Vec<Link> {
         vec![Object(
             "self",
             LinkObject::new("".to_owned(), Box::new(ARTICLE_LINK_META)),
@@ -93,7 +93,7 @@ impl ResourceIdentifiable for Person {
 }
 
 impl Linkify for Person {
-    fn get_links() -> Vec<Link> {
+    fn get_links(&self) -> Vec<Link> {
         unimplemented!()
     }
 }
@@ -116,7 +116,7 @@ impl ResourceIdentifiable for Author {
 }
 
 impl Linkify for Author {
-    fn get_links() -> Vec<Link> {
+    fn get_links(&self) -> Vec<Link> {
         unimplemented!()
     }
 }

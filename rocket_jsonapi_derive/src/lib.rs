@@ -7,7 +7,7 @@ use std::error::Error;
 use syn;
 use syn::export::Formatter;
 use syn::Lit::Str;
-use syn::Meta::NameValue;
+use syn::Meta::{List, NameValue};
 use syn::MetaNameValue;
 
 #[derive(Debug)]
@@ -25,7 +25,7 @@ fn impl_linkify(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, Error
     let name = &ast.ident;
     Ok(quote! {
         impl rocket_jsonapi::links::Linkify for #name {
-            fn get_links() -> Vec<rocket_jsonapi::links::Link> {
+            fn get_links(&self) -> Vec<rocket_jsonapi::links::Link> {
                 vec![]
             }
         }
@@ -35,6 +35,42 @@ fn impl_linkify(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, Error
 #[proc_macro_derive(Linkify)]
 pub fn linkify_derive(input: TokenStream) -> TokenStream {
     expand_proc_macro(input, impl_linkify)
+}
+
+fn impl_relationships(ast: syn::DeriveInput) -> Result<proc_macro2::TokenStream, ErrorMessage> {
+    /*
+    let relationships = &ast
+        .attrs
+        .iter()
+        .filter_map(|attr| attr.parse_meta().ok())
+        .filter_map(|m| match m {
+            List(meta_list) => Some(meta_list),
+            _ => None,
+        })
+        .find(|m| m.path.is_ident("relationship"))
+        .map(|meta_list| {
+            let mut metas: Vec<syn::Meta> = Vec::new();
+            for nested_meta in meta_list.nested {
+                match nested_meta {
+                    syn::NestedMeta::Meta(meta) => metas.append(meta),
+                    _ => {}
+                }
+            }
+        });
+    */
+    let name = &ast.ident;
+    Ok(quote! {
+        impl rocket_jsonapi::relationship::Relationships for #name {
+            fn get_all_relation_objects() -> Vec<rocket_jsonapi::relationship::RelationObject> {
+                vec![]
+            }
+        }
+    })
+}
+
+#[proc_macro_derive(Relationships, attributes(relationships))]
+pub fn relationships_derive(input: TokenStream) -> TokenStream {
+    expand_proc_macro(input, impl_relationships)
 }
 
 // TODO refactor, better names
